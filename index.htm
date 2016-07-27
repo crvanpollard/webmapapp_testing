@@ -300,12 +300,11 @@
           <div class="panel-collapse collapse in" id="overlay-layers">
             <div class="panel-body" style="padding: 0px 15px;">
               <div class="radio">
-                <label><input id="99" name="optradio" type="radio" value=
-                "0">None</label>
+                <label><input checked="checked"  data-value="99,99" name="optradio" type="radio" value="0">None</label>
               </div>
               <h5>Reduce Congestion</h5>
               <div class="radio">
-                <label><input checked="checked" data-value="0,1" name="optradio"
+                <label><input data-value="0,1" name="optradio"
                 type="radio" value="1">High Travel Time Index (TTI)</label>
               </div>
               <div class="radio">
@@ -389,7 +388,7 @@
 
   cmp_PNT = L.esri.dynamicMapLayer({
     url : 'http://arcgis.dvrpc.org/arcgis/rest/services/AppData/CMP_Performance/MapServer',
-    layers : [0,1]
+    layers : [99,100]
   }); 
 
   var tile_group = L.layerGroup().addTo(map);
