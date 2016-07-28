@@ -1,5 +1,6 @@
 	$(document).ready(function() {
-	 loadImage();   
+	 loadImage();  
+	   $('#aboutModal').modal(); 
 	  $('.form-control').change(function() {
 	    // If the load_image option was selected, call the loadImage() function
 	    if ($(this).val() == 'load_image') {
@@ -24,29 +25,30 @@
 	});	
 
 	function loadImage(){
-	  $('#legendBox').css('backgroundImage', 'url(img/legend_crash3.png)');
-	  $('#legendBox').css('width', '190');
-	  $('#legendBox').css('height', '141');
+	  $('#legendBox').css('backgroundImage', 'url(img/FC1.png)');
+	  $('#legendBox').css('width', '145');
+	  $('#legendBox').css('height', '145');
 	}
 	function loadImage1(){
-	  $('#legendBox').css('backgroundImage', 'url(img/legend_injury3.png)');
-	  $('#legendBox').css('width', '190');
+	  $('#legendBox').css('backgroundImage', 'url(img/FC3.png)');
+	  $('#legendBox').css('width', '130');
 	  $('#legendBox').css('height', '141');
 	}
 	function loadImage2(){
-	  $('#legendBox').css('backgroundImage', 'url(img/legend_fatal1.png)');
-	  $('#legendBox').css('width', '190');
-	  $('#legendBox').css('height', '141');
+	  $('#legendBox').css('backgroundImage', 'url(img/FC2.png)');
+	  $('#legendBox').css('width', '245');
+	  $('#legendBox').css('height', '120');
 	}
 	function loadImage3(){
-	  $('#legendBox').css('backgroundImage', 'url(img/legend_crash3.png)');
-	  $('#legendBox').css('width', '190');
-	  $('#legendBox').css('height', '141');
+	  $('#legendBox').css('backgroundImage', 'url(img/FC4.png)');
+	  $('#legendBox').css('width', '130');
+	  $('#legendBox').css('height', '140');
 	}
 
 	$('#legendBox').appendTo('#map');
 
   var map;
+  var props;
     
 
   var getParameterByName = function(name) {
@@ -62,21 +64,21 @@
     layer = currentLayer || "X045FOR";
     var series = {
       "X045FOR": {
-        "breaks": [24000, 12000, 6000, 3000, 1],
-        "colors": ["#a63603","#e6550d","#fd8d3c","#fdbe85","#feedde"]
+        "breaks": [157050,24000, 12000, 6000, 3000, 1],
+        "colors": ["red","#a63603","#e6550d","#fd8d3c","#fdbe85","#feedde"]
       },
       "ABSC1545": {
-        "breaks": [5000, 1500,500, -500, -5000],
-        "colors": ['#54278f','#756bb1','#9e9ac8','#cbc9e2','#f2f0f7']
+        "breaks": [30410,5000, 1500,500, -500, -5000],
+        "colors": ['red','#54278f','#756bb1','#9e9ac8','#cbc9e2','#f2f0f7']
       },
 	   "PERC1545": {
-        "breaks": [.50000, .25000, .05, -.05001, -.9999],
+        "breaks": [1.00549,.50000, .25000, .05, -.05001, -.9999],
        // blue "colors": ['#08519c','#3182bd','#6baed6','#bdd7e7','#eff3ff',]
-        "colors": ['#045a8d','#2b8cbe','#74a9cf','#bdc9e1','#9C9C9C']
+        "colors": ['red','#045a8d','#2b8cbe','#74a9cf','#bdc9e1','#9C9C9C']
      },	
       "AB_SQMI": {
-        "breaks": [1500, 700, 300, 100, -350],
-        "colors": ['#006d2c','#2ca25f','#66c2a4','#b2e2e2','#edf8fb']
+        "breaks": [4728,1500, 700, 300, 100, -350],
+        "colors": ['red','#006d2c','#2ca25f','#66c2a4','#b2e2e2','#edf8fb']
      }
 	}
     for (var i=0; i < series[layer]["breaks"].length; i++){
@@ -92,7 +94,7 @@
       color: '#666',
       weight: 1,
       opacity: 1,
-      fillOpacity: .80,
+      fillOpacity: .70,
       fillColor: (feature.properties) ?
         getIMDColor(feature.properties[currentLayer]) :
         null
@@ -107,7 +109,8 @@
      //   layer.bindLabel('Census Tract ' + feature.properties.TRACTCE10);
         layer.on({
           click: tboro,
-          mouseover: highlightFeature,
+        //  mouseover: highlightFeature,
+          mouseover: hover,
           mouseout: resetHighlight
         });
 	   }
@@ -128,11 +131,14 @@
 		//	resetHighlight();
 		var layer = e.target;
 		var props = layer.feature.properties
-       // var info = '<h1>' + props.Name + '</h1>';
+        var info = '<h1>' + props.Name + '</h1>';
 		  
-		  var tableinfo = '<div id="tableinfo"><i><h4>Municipal-Level Population Forecasts (2015-2045)</h4></i></div>'
+		  var tableinfo = '<div id="tableinfo"><h4><b>Municipal-Level Population Forecasts (2015-2045)</b></h4></div>'
 		  var content ='<table id="crashtable">'+
-					   '<tr><b>'+ (props.MCD)+'</b></tr>'+
+					   '<tr><b><font color="#0074ad">'+ (props.MCD)+' , '+(props.CO_NAME)+' County</font></b></tr>'+
+					   '<br>Absolute Change (2015-2045): <b>'+numeral(props.ABSC1545).format('0,0')+'</b></br>'+
+					   'Percent Change (2015-2045): <b>'+numeral(props.PERC1545).format('0.00%')+
+					   '</b><br>Absolute Change per Square Mile (2015-2045): <b>'+numeral(props.AB_SQMI).format('0,0.00')+'</b>'+
 			           '<tbody>'+
 			           '<tr class="odd">'+
 					   '<th>2015 Population</th><td>' + numeral(props.POP2015).format('0,0') + '</td>' + 
@@ -150,9 +156,11 @@
 			           '<th>2045 Forecast</th><td>' + numeral(props.POP2045).format('0,0')+ '</td>' + 
 			           '</tbody>'+						
 				       '<table>';
-	 var tableinfo2 = '<div id="tableinfo2"><i><h4>County-Level Population Forecasts (2015-2045)</h4></i></div>'						   
+	 var tableinfo2 = '<div id="tableinfo2"></br><h4><b>County-Level Population Forecasts (2015-2045)</b></h4></div>'						   
 	 var content2 =   '<table id="crashtable">'+
-					   '<b>'+ (props.CO_NAME)+" County" +'</b>'+
+					   '<b><font color="#0074ad">'+ (props.CO_NAME)+" County" +'</font></b>'+
+					   '<br>Absolute Change (2015-2045): <b>'+numeral(props.abs45cty).format('0,0')+'</b></br>'+
+					   'Percent Change (2015-2045): <b>'+numeral(props.per45cty).format('0.00%')+'</b>'+
 			           '<tbody>'+
 			           '<tr class="odd">'+
 					   '<th>2015 Population</th><td>' + numeral(props.cnty15).format('0,0') + '</td>' + 
@@ -175,16 +183,23 @@
 			document.getElementById('infoside2barheader').innerHTML = tableinfo2;
 			document.getElementById('infosidebar2').innerHTML = content2;
   		};
+		var label = new L.Label(); 
 
-	/*	var label = new L.Label(); 
 		function hover(e) { 
 		var layer = e.target;
 		var props = layer.feature.properties;
-		layer.setStyle({ weight: 3,color: '#B9131A',opacity:1}).bindLabel('<b>' + [props.Mun_Name] + '</b>').addTo(map);
-		if (!L.Browser.ie && !L.Browser.opera) {
-			layer.bringToFront();
-			}			
-		} */
+		info.update(layer.feature.properties);
+		layer.setStyle({
+		       weight: 3,
+			   color: 'red',
+			   opacity:1
+		    })
+			
+		    if (!L.Browser.ie && !L.Browser.opera) {
+		        layer.bringToFront();
+		    }
+						
+		}
 					
 		function highlightFeature(e) {
 		var layer = e.target;
@@ -198,7 +213,9 @@
 				
 		function resetHighlight(e) {
 		   lsoaLayer.resetStyle(e.target);
+		   	  info.update();
 		}
+
 
 		var map = L.map("map", {
         zoom: 9,
@@ -231,7 +248,24 @@
 		map.addLayer(DVRPC);
 		map.addLayer(lsoaLayer);
 
-  		var showInfo = !(getParameterByName("info") == "false");
+		var info = L.control();
+
+		info.onAdd = function (map) {
+		    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+		    this.update();
+		    return this._div;
+		};
+
+		// method that we will use to update the control based on feature properties passed
+		info.update = function (props) {
+		    this._div.innerHTML = '<B></B>' +  (props ?
+		        '<h4>' + (props.MUN_NAME) + '</h4>'
+		        : '');
+		};
+
+		info.addTo(map);
+
+  	//	var showInfo = !(getParameterByName("info") == "false");
 
         $('select option[name="layer"]').click(function(){
           currentLayer = $(this).data("layer");

@@ -8,8 +8,11 @@
 }
 th {
     text-align: center;
+    font-weight: normal;
 }
-   
+td {
+  font-weight: bold;
+}   
 #crashtable .hiconeven
 {
   border: 2px solid black;
@@ -19,25 +22,14 @@ th {
 {
   border: 2px solid black;
 }
-
-
-#icon{
-  display: block;
-    margin-left: auto;
-    margin-right: auto
-  
-}
-
  #crashtable .odd
 {
   background: #E5E5E5; 
 /*  border-right: 2px solid black; */
   border: 2px solid black;
 }
-
 #crashtable .even
 {
- 
   border-right: 2px solid black;
 }
 
@@ -69,29 +61,3 @@ th {
   border: 1px solid black;
   padding: 2px;
 }
-
-#crashtable .total
-{
- 
-  border-right: 2px solid black;
-}
-
-
- #crashtable .total th
-{ 
-  padding: 4px;
-  border-top: 2px solid black;
-  border-right: 2px solid black;
-  border-bottom: 2px solid black;
-  border-left: 2px solid black;
-}
-
- #crashtable .total td
-{
-  padding: 2px;
-  border-top: 2px solid black;
-    border-right: 1px solid black;
-	border-bottom: 2px solid black;
-  background: #F2DDDD; 
-}
-
