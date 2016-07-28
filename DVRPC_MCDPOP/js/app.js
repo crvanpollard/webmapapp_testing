@@ -47,6 +47,19 @@
 
 	$('#legendBox').appendTo('#map');
 
+	 $('select option[name="layer"]').click(function(){
+          currentLayer = $(this).data("layer");
+          if (currentLayer == "none") {
+            map.removeLayer(lsoaLayer);
+          } else {
+            if (!map.hasLayer(lsoaLayer)){
+              map.addLayer(lsoaLayer);
+            } else {
+              lsoaLayer.setStyle(getIMDStyle);
+            }
+          }
+        });
+
   var map;
   var props;
     
@@ -270,18 +283,7 @@
 
   	//	var showInfo = !(getParameterByName("info") == "false");
 
-        $('select option[name="layer"]').click(function(){
-          currentLayer = $(this).data("layer");
-          if (currentLayer == "none") {
-            map.removeLayer(lsoaLayer);
-          } else {
-            if (!map.hasLayer(lsoaLayer)){
-              map.addLayer(lsoaLayer);
-            } else {
-              lsoaLayer.setStyle(getIMDStyle);
-            }
-          }
-        });
+       
 
         function populateCounty(e) {
               //  lsoaLayer.setStyle({fillColor: "#396ab2"});
@@ -290,11 +292,11 @@
 
                 var props = layer.feature.properties,
 
-				 MunPop = ([props.POP2015, props.POP2020, props.POP2025, props.POP2030, props.POP2035, props.POP2040,props.POP2045]);
+			//	 MunPop = ([props.POP2015, props.POP2020, props.POP2025, props.POP2030, props.POP2035, props.POP2040,props.POP2045]);
 				 CntyPop = ([props.cnty2015, props.cnty2020, props.cnty2025, props.cnty2030, props.cnty2035, props.cnty2040,props.cnty2045]);
 				// CtyPop = [props.SUM_POP00, props.SUM_POP10, props.SUM_POP15, props.SUM_POP20, props.SUM_POP25, props.SUM_POP30, props.SUM_POP35, props.SUM_POP40],
 				
-			     updatePopMCD(MunPop)
+			//     updatePopMCD(MunPop)
 			     updatePopCnty(CntyPop)
 			 };
              // 
@@ -302,7 +304,7 @@
                 //updateEmpCty(CtyEmp);
 			//	$('#myTab a[href="#POP"]').tab('show')
          //   };
- function updatePopMCD(Values){
+/* function updatePopMCD(Values){
     var MCDChart = {
         chart: {
             renderTo: 'containerMunPop',
@@ -337,14 +339,6 @@
         credits: {
             enabled: false
         },
-  /*      plotOptions: {
-            line: {
-                dataLabels: {
-                    enabled: true
-                },
-                enableMouseTracking: true
-            }
-        },*/
         series: [{
            name:'Population',
 		   id: 'Values',
@@ -361,7 +355,7 @@
     MCDChart.series[0].data = countData;
     var chart = new Highcharts.Chart(MCDChart)
 
-}
+} */
 
 function updatePopCnty(Values){
     var CntyChart = {
