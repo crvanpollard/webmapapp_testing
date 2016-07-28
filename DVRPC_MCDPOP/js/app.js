@@ -182,6 +182,7 @@
 			document.getElementById('infosidebar').innerHTML = content;
 			document.getElementById('infoside2barheader').innerHTML = tableinfo2;
 			document.getElementById('infosidebar2').innerHTML = content2;
+			$('#cardclick').hide();
   		};
 		var label = new L.Label(); 
 
@@ -290,12 +291,13 @@
                 var props = layer.feature.properties,
 
 				 MunPop = ([props.POP2015, props.POP2020, props.POP2025, props.POP2030, props.POP2035, props.POP2040,props.POP2045]);
-				// CntyPop = ([props.cnty15, props.cnty2020, props.cnty2025, props.cnty2030, props.cnty2035, props.cnty2040,props.cnty2045]);
+				 CntyPop = ([props.cnty2015, props.cnty2020, props.cnty2025, props.cnty2030, props.cnty2035, props.cnty2040,props.cnty2045]);
 				// CtyPop = [props.SUM_POP00, props.SUM_POP10, props.SUM_POP15, props.SUM_POP20, props.SUM_POP25, props.SUM_POP30, props.SUM_POP35, props.SUM_POP40],
 				
 			     updatePopMCD(MunPop)
+			     updatePopCnty(CntyPop)
 			 };
-             //    updatePopCnty(CntyPop)};
+             // 
      
                 //updateEmpCty(CtyEmp);
 			//	$('#myTab a[href="#POP"]').tab('show')
