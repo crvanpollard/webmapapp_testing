@@ -4,46 +4,40 @@
  #crashtable{
   border-collapse: collapse;
   text-align: center;
-  width: 100%;
+  width: 92%;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 th {
     text-align: center;
     font-weight: normal;
+    font-size: 80%;
 }
 td {
   font-weight: bold;
+  font-size: 80%;
 }   
-#crashtable .hiconeven
-{
-  border: 2px solid black;
-}
-   
-#crashtable .hiconodd
-{
-  border: 2px solid black;
-}
  #crashtable .odd
 {
-  background: #E5E5E5; 
-/*  border-right: 2px solid black; */
-  border: 2px solid black;
+  background:#ededed; 
+  border: 1px solid #bdbdbd;
 }
 #crashtable .even
 {
-  border-right: 2px solid black;
+  border-right: 1px solid #bdbdbd;
 }
 
  #crashtable .odd th
 { 
   padding: 4px;
-  border-bottom: 1px solid black;
-  border-right: 2px solid black;
-  border-left: 2px solid black;
+  border-bottom: 1px solid #bdbdbd;
+  border-right: 1px solid #bdbdbd;
+  border-left: 1px solid #bdbdbd;
 }
 
  #crashtable .odd td
 {
-  border: 1px solid black;
+  border: 1px solid #bdbdbd;
   padding: 2px;
   
 }
@@ -51,13 +45,13 @@ td {
  #crashtable .even th
 { 
   padding: 4px;
-  border-bottom: 1px solid black;
-  border-right: 2px solid black;
-  border-left: 2px solid black;
+  border-bottom: 1px solid #bdbdbd;
+  border-right: 1px solid #bdbdbd;
+  border-left: 1px solid #bdbdbd;
 }
 
  #crashtable .even td
 {
-  border: 1px solid black;
+  border: 1px solid #bdbdbd;
   padding: 2px;
 }

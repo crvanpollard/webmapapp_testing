@@ -1,6 +1,6 @@
 	$(document).ready(function() {
 	 loadImage();  
-	   $('#aboutModal').modal(); 
+	 //  $('#aboutModal').modal(); 
 	  $('.form-control').change(function() {
 	    // If the load_image option was selected, call the loadImage() function
 	    if ($(this).val() == 'load_image') {
@@ -64,17 +64,16 @@
     layer = currentLayer || "X045FOR";
     var series = {
       "X045FOR": {
-        "breaks": [157050,24000, 12000, 6000, 3000, 1],
-        "colors": ["red","#a63603","#e6550d","#fd8d3c","#fdbe85","#feedde"]
+        "breaks": [24000, 12000, 6000, 3000, 1],
+        "colors": ["#a63603","#e6550d","#fd8d3c","#fdbe85","#feedde"]
       },
       "ABSC1545": {
-        "breaks": [30410,5000, 1500,500, -500, -5000],
-        "colors": ['red','#54278f','#756bb1','#9e9ac8','#cbc9e2','#f2f0f7']
+        "breaks": [ 5000, 1500, 500, -500, -5000],
+        "colors": ['#54278f','#756bb1','#9e9ac8','#cbc9e2','#f2f0f7']
       },
 	   "PERC1545": {
-        "breaks": [1.00549,.50000, .25000, .05, -.05001, -.9999],
-       // blue "colors": ['#08519c','#3182bd','#6baed6','#bdd7e7','#eff3ff',]
-        "colors": ['red','#045a8d','#2b8cbe','#74a9cf','#bdc9e1','#9C9C9C']
+        "breaks": [.50000, .25000, .05, -.05001, -.9999],
+        "colors": ['#045a8d','#2b8cbe','#74a9cf','#bdc9e1','#9C9C9C']
      },	
       "AB_SQMI": {
         "breaks": [4728,1500, 700, 300, 100, -350],
@@ -94,7 +93,7 @@
       color: '#666',
       weight: 1,
       opacity: 1,
-      fillOpacity: .70,
+      fillOpacity: .75,
       fillColor: (feature.properties) ?
         getIMDColor(feature.properties[currentLayer]) :
         null
@@ -107,6 +106,7 @@
       feature.id = L.stamp(layer);
       if (feature.properties) {
      //   layer.bindLabel('Census Tract ' + feature.properties.TRACTCE10);
+        layer.on({click:populateCounty});
         layer.on({
           click: tboro,
         //  mouseover: highlightFeature,
@@ -133,7 +133,7 @@
 		var props = layer.feature.properties
         var info = '<h1>' + props.Name + '</h1>';
 		  
-		  var tableinfo = '<div id="tableinfo"><h4><b>Municipal-Level Population Forecasts (2015-2045)</b></h4></div>'
+		  var tableinfo = '<div id="tableinfo"><h4><b>Municipal-Level Population Forecasts, 2015-2045</b></h4></div>'
 		  var content ='<table id="crashtable">'+
 					   '<tr><b><font color="#0074ad">'+ (props.MCD)+' , '+(props.CO_NAME)+' County</font></b></tr>'+
 					   '<br>Absolute Change (2015-2045): <b>'+numeral(props.ABSC1545).format('0,0')+'</b></br>'+
@@ -156,7 +156,7 @@
 			           '<th>2045 Forecast</th><td>' + numeral(props.POP2045).format('0,0')+ '</td>' + 
 			           '</tbody>'+						
 				       '<table>';
-	 var tableinfo2 = '<div id="tableinfo2"></br><h4><b>County-Level Population Forecasts (2015-2045)</b></h4></div>'						   
+	 var tableinfo2 = '<div id="tableinfo2"></br><h4><b>County-Level Population Forecasts, 2015-2045</b></h4></div>'						   
 	 var content2 =   '<table id="crashtable">'+
 					   '<b><font color="#0074ad">'+ (props.CO_NAME)+" County" +'</font></b>'+
 					   '<br>Absolute Change (2015-2045): <b>'+numeral(props.abs45cty).format('0,0')+'</b></br>'+
@@ -265,6 +265,8 @@
 
 		info.addTo(map);
 
+		  
+
   	//	var showInfo = !(getParameterByName("info") == "false");
 
         $('select option[name="layer"]').click(function(){
@@ -279,3 +281,143 @@
             }
           }
         });
+
+        function populateCounty(e) {
+              //  lsoaLayer.setStyle({fillColor: "#396ab2"});
+                var layer = e.target;
+               // layer.setStyle({fillColor: "#312867"});
+
+                var props = layer.feature.properties,
+
+				 MunPop = ([props.POP2015, props.POP2020, props.POP2025, props.POP2030, props.POP2035, props.POP2040,props.POP2045]);
+				// CntyPop = ([props.cnty15, props.cnty2020, props.cnty2025, props.cnty2030, props.cnty2035, props.cnty2040,props.cnty2045]);
+				// CtyPop = [props.SUM_POP00, props.SUM_POP10, props.SUM_POP15, props.SUM_POP20, props.SUM_POP25, props.SUM_POP30, props.SUM_POP35, props.SUM_POP40],
+				
+			     updatePopMCD(MunPop)
+			 };
+             //    updatePopCnty(CntyPop)};
+     
+                //updateEmpCty(CtyEmp);
+			//	$('#myTab a[href="#POP"]').tab('show')
+         //   };
+ function updatePopMCD(Values){
+    var MCDChart = {
+        chart: {
+            renderTo: 'containerMunPop',
+            type: 'line',
+            backgroundColor: 'white',
+            height: 250,
+            marginTop: 10,
+           // width: 290,
+        },
+        title: {
+            text: '',
+            x: -0 //center
+       	 },	
+		   xAxis: {
+            categories: ['2015', '2020', '2025', '2030', '2035', '2040','2045']
+        },
+		  	colors: ['#0074ad'],
+            yAxis: {
+                title: {
+                    text: 'Population'
+                }
+            },
+			 legend:{
+			enabled: false
+		},
+		 tooltip: {
+            formatter:function(){
+
+                return Highcharts.numberFormat(this.point.y,0,',',',')+'</b><br/>';
+            }
+        },
+        credits: {
+            enabled: false
+        },
+  /*      plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: true
+            }
+        },*/
+        series: [{
+           name:'Population',
+		   id: 'Values',
+           data: []
+        }]
+    };
+    var Labels = ["2015", "2020", "2025", "2030","2035", "2040", "2045"],
+    countData = [];
+    for (var i = 0; i < Values.length; i++){
+                countData.push({
+                    name: Labels[i],
+                    y: Values[i]})
+            }
+    MCDChart.series[0].data = countData;
+    var chart = new Highcharts.Chart(MCDChart)
+
+}
+
+function updatePopCnty(Values){
+    var CntyChart = {
+        chart: {
+            renderTo: 'containerCtyPop',
+            type: 'line',
+            backgroundColor: 'white',
+            height: 250,
+            marginTop: 10,
+           // width: 290,
+        },
+        title: {
+            text: '',
+            x: -0 //center
+       	 },	
+		   xAxis: {
+            categories: ['2015', '2020', '2025', '2030', '2035', '2040','2045']
+        },
+		  	colors: ['#0074ad'],
+            yAxis: {
+                title: {
+                    text: 'Population'
+                }
+            },
+			 legend:{
+			enabled: false
+		},
+		 tooltip: {
+            formatter:function(){
+
+                return Highcharts.numberFormat(this.point.y,0,',',',')+'</b><br/>';
+            }
+        },
+        credits: {
+            enabled: false
+        },
+  /*      plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: true
+            }
+        },*/
+        series: [{
+           name:'Population',
+		   id: 'Values',
+           data: []
+        }]
+    };
+    var Labels = ["2015", "2020", "2025", "2030","2035", "2040", "2045"],
+    countData2 = [];
+    for (var i = 0; i < Values.length; i++){
+                countData2.push({
+                    name: Labels[i],
+                    y: Values[i]})
+            }
+    CntyChart.series[0].data = countData2;
+    var chart2 = new Highcharts.Chart(CntyChart)
+
+}
