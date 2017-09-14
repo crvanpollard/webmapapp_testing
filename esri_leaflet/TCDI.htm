@@ -1,0 +1,215 @@
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>ESRI-Leaflet Identify (Drill Down)</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
+
+    <!-- Core CSS -->
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+   
+
+  <!-- Load Esri Leaflet from CDN -->
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+    #legendBox {
+    position: absolute;
+    background:white;
+    height:450px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+  </style>
+</head>
+<body>
+
+<div id="map">
+<div id="legendBox">
+<div id="info-pane"style="padding:10px"></div> 
+<div id="info-pane2"style="padding:10px"></div> 
+</div>
+</div>
+
+<script>
+  // sample server in this example is not CORS enabled, so use JSONP
+    L.esri.get = L.esri.get.JSONP;
+
+   var map = L.map('map', {
+            zoom: 9,
+            minZoom:8,
+            maxZoom:17,
+            center: new L.LatLng(39.97, -75.16),
+      });
+
+  googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+  maxZoom: 20,
+  subdomains:['mt0','mt1','mt2','mt3']
+  }).addTo(map);
+
+  var cwns = L.esri.dynamicMapLayer({
+    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/TCDI_WebApp/MapServer',
+    // layers: [0,2],
+    opacity: 0.7
+  }).addTo(map);
+
+  var identifiedFeature;
+  var pane = document.getElementById('info-pane');
+    var pane2 = document.getElementById('info-pane2');
+
+  map.on('click', function (e) {
+    cwns.identify()
+    .on(map)
+    .at(e.latlng)
+     .layers('visible:1,2,3,4,5,6,7,8,10,11,12,14')
+    .run(function(error, featureCollection){
+      // make sure at least one feature was identified.
+      if (featureCollection.features.length > 0) {
+         for(var i=0;i<featureCollection.features.length;i++) {
+            var feat = featureCollection.features[i];
+            if (feat.layerId === 2) {
+              pane.innerHTML = feat.properties.PROJECTNAM;
+            }
+            else if (feat.layerId === 14) {
+              pane2.innerHTML = feat.properties.PROJECTNAM;
+            }
+                
+                //    break;  
+ //    pane.innerHTML = popContent;
+//        identifiedFeature = L.geoJSON(featureCollection.features[0]).addTo(map);
+//        var landuseDescription =
+//          featureCollection.features[0].properties.LU_Type +
+//          ' - ' +
+//          featureCollection.features[0].properties.LU_Label;
+//        pane.innerHTML = landuseDescription;
+//      }
+//      else {
+/*              if(featureCollection.features.length > 0 ) {
+                        for(var i=0;i<featureCollection.features.length;i++) {
+                            var feat = featureCollection.features[i];
+                            var name = "";
+                            var totalNeeds = 0;
+                            switch(feat.layerId) {
+                                    //also getting all facilities and could use them
+                                case 0:
+                                    name = feat.properties.FACILITY_NAME;
+                                    popContent += "<tr class=''>" + name + "</tr>";
+                                    break;
+                                case 1:
+                                    //save county feature as current
+                                    cwns.current.countyFeature = feat;
+                                    cwns.current.countyGeoJson = new L.GeoJSON(cwns.current.countyFeature, {
+                                        style: function(){
+                                            return {
+                                                color: '#064780',
+                                                weight: 6,
+                                                fill:false
+                                            };
+                                        }
+                                    }).addTo(cwns.current.countyGroupLayer);
+                                    name = feat.properties.NAME;
+                                    popContent += "<tr class='county-row needs-row 'title='Get County Details'>" +
+                                        "<td><button type='button' class='zoom-to-county cwns-zoom-to cwns-btn btn btn-sm' title='Zoom To County'>" +
+                                        "<span class='cwns-icon cwns-icon-map-zoom-to'></span>" +
+                                        "</button></td>";
+                                    if(name != "Null" && name !== null) {
+                                        popContent += "<td>" + feat.properties.NAME + " County</td>";
+                                        totalNeeds = feat.properties.TotalNeeds;
+                                        if(totalNeeds != "Null" && totalNeeds !== null) {
+                                            popContent += "<td>" + cwns.formatAmount(totalNeeds.toString()) + "</td>";
+                                        } else {
+                                            popContent += "<td>" + "$ 0" + "</td>";
+                                        }
+                                    }
+                                    popContent += "<td><span class='cwns-icon cwns-icon-chevron-right'></span></td>";
+                                    popContent += "</tr>";
+                                    break;
+                                case 2:
+                                    //save congressional district feature and add its' geometry to the group layer
+                                    cwns.current.congDistFeature = feat;
+                                    cwns.current.congDistGeoJson = new L.GeoJSON(cwns.current.congDistFeature, {
+                                        style: function(){
+                                            return {
+                                                color: '#F36900',
+                                                weight: 8,
+                                                fill:false
+                                            };
+                                        }
+                                    }).addTo(cwns.current.congDistGroupLayer);
+                                    name = feat.properties.NAMELSAD;
+                                    popContent += "<tr class='congressional-district-row needs-row' title='Get District Details'>" +
+                                        "<td><button type='button' class='zoom-to-cong-dist cwns-zoom-to cwns-btn btn btn-sm' title='Zoom To District'>" +
+                                        "<span class='cwns-icon cwns-icon-map-zoom-to'></span>" +
+                                        "</button></td>";
+                                    if(name != "Null" && name !== null) {
+                                        popContent += "<td>" + feat.properties.NAMELSAD + "</td>";
+                                        totalNeeds = feat.properties.TotalNeeds;
+                                        if(totalNeeds != "Null" && totalNeeds !== null) {
+                                            popContent += "<td>" +
+                                                cwns.formatAmount(totalNeeds.toString()) + "</td>";
+                                        } else {
+                                            popContent += "<td>" + "$ 0" + "</td>";
+                                        }
+                                    }
+                                    popContent += "<td><span class='cwns-icon cwns-icon-chevron-right'></span></td>";
+                                    popContent += "</tr>";
+                                    break;
+                                case 3:
+                                    //save state feature and add its' geometry to the group layer
+                                    cwns.current.stateFeature = feat;
+                                    cwns.current.stateGeoJson = new L.GeoJSON(cwns.current.stateFeature, {
+                                        style: function(){
+                                            return {
+                                                color: '#004120',
+                                                weight: 10,
+                                                fill:false
+                                            };
+                                        }
+                                    }).addTo(cwns.current.stateGroupLayer);
+                                    name = feat.properties.NAME;
+                                    popContent += "<tr class='state-row needs-row' title='Get State Details'>" +
+                                        "<td><button type='button' class='zoom-to-state cwns-zoom-to cwns-btn btn btn-sm' title='Zoom To State'>" +
+                                        "<span class='cwns-icon cwns-icon-map-zoom-to'></span>" +
+                                        "</button></td>";
+                                    if(name != "Null" && name !== null) {
+                                        popContent += "<td>" + feat.properties.NAME + "</td>";
+                                        totalNeeds = feat.properties.TotalNeeds;
+                                        if(totalNeeds != "Null" && totalNeeds !== null) {
+                                            popContent += "<td>" + cwns.formatAmount(totalNeeds.toString()) + "</td>";
+                                        } else {
+                                            popContent += "<td>" + "$ 0" + "</td>";
+                                        }
+                                    }
+                                    popContent += "<td><span class='cwns-icon cwns-icon-chevron-right'></span></td>";
+                                    popContent += "</tr>";
+                                    break;
+                             */        
+              //             }    
+                        }
+
+                    } else {
+        pane.innerHTML = 'No features identified.';
+      }   
+    });
+  });
+
+</script>
+
+</body>
+</html>
