@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+  <title>ESRI Leaflet - Toggle</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/leaflet/1.0.0-beta.2/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/leaflet/1.0.0-beta.2/leaflet.js"></script>
+    <!-- Core CSS -->
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+   
+
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/leaflet.esri/2.0.0-beta.8/esri-leaflet.js"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+    #legendBox {
+    position: absolute;
+    background:white;
+    height:450px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+    #download_button{
+      margin-left:80px;
+    }
+
+    /* loading styles */
+    .loading-panel {
+      background-color: rgba(239, 239, 239, 0.26);
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 1048;
+      transition: all .3s ease-out;
+    }
+    /*!
+     * Load Awesome v1.1.0 (http://github.danielcardoso.net/load-awesome/)
+     * Copyright 2015 Daniel Cardoso <@DanielCardoso>
+     * Licensed under MIT
+     */
+    .spin-item{
+        margin: 25% auto;
+        top: 100px;
+        width: 80px;
+    }
+    .la-ball-spin-clockwise,
+    .la-ball-spin-clockwise > div {
+        position: relative;
+        -webkit-box-sizing: border-box;
+           -moz-box-sizing: border-box;
+                box-sizing: border-box;
+    }
+
+    .la-ball-spin-clockwise {
+        display: block;
+        font-size: 0;
+        color: #312867;
+    }
+
+    .la-ball-spin-clockwise.la-dark {
+        color: #333;
+    }
+
+    .la-ball-spin-clockwise > div {
+        display: inline-block;
+        float: none;
+        background-color: currentColor;
+        border: 0 solid currentColor;
+    }
+
+    .la-ball-spin-clockwise {
+        width: 32px;
+        height: 32px;
+    }
+
+    .la-ball-spin-clockwise > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 8px;
+        height: 8px;
+        margin-top: -4px;
+        margin-left: -4px;
+        border-radius: 100%;
+        -webkit-animation: ball-spin-clockwise 1s infinite ease-in-out;
+           -moz-animation: ball-spin-clockwise 1s infinite ease-in-out;
+             -o-animation: ball-spin-clockwise 1s infinite ease-in-out;
+                animation: ball-spin-clockwise 1s infinite ease-in-out;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(1) {
+        top: 5%;
+        left: 50%;
+        -webkit-animation-delay: -.875s;
+           -moz-animation-delay: -.875s;
+             -o-animation-delay: -.875s;
+                animation-delay: -.875s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(2) {
+        top: 18.1801948466%;
+        left: 81.8198051534%;
+        -webkit-animation-delay: -.75s;
+           -moz-animation-delay: -.75s;
+             -o-animation-delay: -.75s;
+                animation-delay: -.75s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(3) {
+        top: 50%;
+        left: 95%;
+        -webkit-animation-delay: -.625s;
+           -moz-animation-delay: -.625s;
+             -o-animation-delay: -.625s;
+                animation-delay: -.625s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(4) {
+        top: 81.8198051534%;
+        left: 81.8198051534%;
+        -webkit-animation-delay: -.5s;
+           -moz-animation-delay: -.5s;
+             -o-animation-delay: -.5s;
+                animation-delay: -.5s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(5) {
+        top: 94.9999999966%;
+        left: 50.0000000005%;
+        -webkit-animation-delay: -.375s;
+           -moz-animation-delay: -.375s;
+             -o-animation-delay: -.375s;
+                animation-delay: -.375s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(6) {
+        top: 81.8198046966%;
+        left: 18.1801949248%;
+        -webkit-animation-delay: -.25s;
+           -moz-animation-delay: -.25s;
+             -o-animation-delay: -.25s;
+                animation-delay: -.25s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(7) {
+        top: 49.9999750815%;
+        left: 5.0000051215%;
+        -webkit-animation-delay: -.125s;
+           -moz-animation-delay: -.125s;
+             -o-animation-delay: -.125s;
+                animation-delay: -.125s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(8) {
+        top: 18.179464974%;
+        left: 18.1803700518%;
+        -webkit-animation-delay: 0s;
+           -moz-animation-delay: 0s;
+             -o-animation-delay: 0s;
+                animation-delay: 0s;
+    }
+
+    .la-ball-spin-clockwise.la-sm {
+        width: 16px;
+        height: 16px;
+    }
+
+    .la-ball-spin-clockwise.la-sm > div {
+        width: 4px;
+        height: 4px;
+        margin-top: -2px;
+        margin-left: -2px;
+    }
+
+    .la-ball-spin-clockwise.la-2x {
+        width: 64px;
+        height: 64px;
+    }
+
+    .la-ball-spin-clockwise.la-2x > div {
+        width: 16px;
+        height: 16px;
+        margin-top: -8px;
+        margin-left: -8px;
+    }
+
+    .la-ball-spin-clockwise.la-3x {
+        width: 96px;
+        height: 96px;
+    }
+
+    .la-ball-spin-clockwise.la-3x > div {
+        width: 24px;
+        height: 24px;
+        margin-top: -12px;
+        margin-left: -12px;
+    }
+
+    /*
+     * Animation
+     */
+    @-webkit-keyframes ball-spin-clockwise {
+        0%,
+        100% {
+            opacity: 1;
+            -webkit-transform: scale(1);
+                    transform: scale(1);
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 0;
+            -webkit-transform: scale(0);
+                    transform: scale(0);
+        }
+    }
+    @-moz-keyframes ball-spin-clockwise {
+        0%,
+        100% {
+            opacity: 1;
+            -moz-transform: scale(1);
+                 transform: scale(1);
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 0;
+            -moz-transform: scale(0);
+                 transform: scale(0);
+        }
+    }
+    @-o-keyframes ball-spin-clockwise {
+        0%,
+        100% {
+            opacity: 1;
+            -o-transform: scale(1);
+               transform: scale(1);
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 0;
+            -o-transform: scale(0);
+               transform: scale(0);
+        }
+    }
+    @keyframes ball-spin-clockwise {
+        0%,
+        100% {
+            opacity: 1;
+            -webkit-transform: scale(1);
+               -moz-transform: scale(1);
+                 -o-transform: scale(1);
+                    transform: scale(1);
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 0;
+            -webkit-transform: scale(0);
+               -moz-transform: scale(0);
+                 -o-transform: scale(0);
+                    transform: scale(0);
+        }
+    }
+
+
+  </style>
+</head>
+<body>
+
+<div id="map">
+    <div id="legendBox">
+      <div class="panel-group">
+        <div class="panel panel-default">
+          <div class="panel-collapse collapse in" id="overlay-layers">
+            <div class="panel-body" style="padding: 0px 15px;">
+              <div class="radio">
+                <label><input checked="checked"  data-value="99,99" name="optradio" type="radio" value="0">None</label>
+              </div>
+              <h5>Reduce Congestion</h5>
+              <div class="radio">
+                <label><input data-value="0,1" name="optradio"
+                type="radio" value="1">High Travel Time Index (TTI)</label>
+              </div>
+              <div class="radio">
+                <label><input data-value="2,3" name="optradio" type="radio" value=
+                "2">Current Peak Hour V/C Ratios</label>
+              </div>
+              <div class="radio disabled">
+                <label><input data-value="4,5" name="optradio" type="radio" value=
+                "3">High Anticipated Growth in V/C</label>
+              </div>
+              <h5>Increase Accessibility &amp; Mobility</h5>
+              <div class="radio">
+                <label><input data-value="6,7" name="optradio" type="radio" value=
+                "4">High Transit Score</label>
+              </div>
+              <div class="radio">
+                <label><input data-value="8,9" name="optradio" type="radio" value=
+                "5">High Planning Time Index (PTI)</label>
+              </div>
+              <h5>Rebuild &amp; Maintain Transportation Infrastructure</h5>
+              <div class="radio">
+                <label><input data-value="10,11" name="optradio" type="radio" value=
+                "6">Transportation Infrastructure</label>
+              </div>
+              <div class="radio">
+                <label><input data-value="12,13" name="optradio" type="radio" value=
+                "7">Existing Transit</label>
+              </div>
+              <h5>Create a Safer Transportation System</h5>
+              <div class="radio">
+                <label><input data-value="14,15" name="optradio" type="radio" value=
+                "8">High Crash Rates on Road Segments with V/C Ratio
+                &gt;=.5</label>
+              </div>
+              <h5>Create a More Secure Transportation System</h5>
+              <div class="radio">
+                <label><input data-value="16,17" name="optradio" type="radio" value=
+                "9">Important Areas for Transportation Security
+                Planning</label>
+              </div>
+              <div class="radio">
+                <label><input data-value="18,19" name="optradio" type="radio" value=
+                "10">Areas of Special Evacuation Concern</label>
+              </div>
+              <h5>Ensure Transportation Investments Support LRP Principles</h5>
+              <div class="radio">
+                <label><input data-value="20,21" name="optradio" type="radio" value=
+                "11">Low Green Infrastructure Screening Tool Scores</label>
+              </div>
+              <div class="radio">
+                <label><input data-value="22,23" name="optradio" type="radio" value=
+                "12">Conections 2040 - Infill and Redevelopment Areas and
+                Emergeing Growth Areas</label>
+              </div>
+              <div class="radio disabled">
+                <label><input data-value="24,25" name="optradio" type="radio" value=
+                "13">Conections 2040 - Land Use</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="loading-panel stat-map" style="display:none;"><div class="spin-item"><div class="item-inner"><div class="item-loader-container"><div class="la-ball-spin-clockwise la-2x"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div></div></div></div>
+  </div>
+
+<script>
+  var cmp_PNT;
+  var tg = 0;
+  var map = L.map('map', {
+    zoom: 9,
+    minZoom:8,
+    maxZoom:17,
+    center: new L.LatLng(39.97, -75.16),
+  });
+
+  googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+  }).addTo(map);
+
+  cmp_PNT = L.esri.dynamicMapLayer({
+    url : 'http://arcgis.dvrpc.org/arcgis/rest/services/AppData/CMP_Performance/MapServer',
+    layers : [99,100]
+  }); 
+
+  var tile_group = L.layerGroup().addTo(map);
+  tile_group.addLayer(cmp_PNT);
+  checkIfLoaded();
+
+
+  $('input[type=radio][name=optradio]').on('change', function(){
+    var layer_ids = $(this).attr('data-value').split(',');
+    
+    cmp_PNT = L.esri.dynamicMapLayer({
+      url : 'http://arcgis.dvrpc.org/arcgis/rest/services/AppData/CMP_Performance/MapServer',
+      layers : [layer_ids[0], layer_ids[1]]
+    }); 
+ 
+    //add new tiles to overlay group
+    tile_group.clearLayers().addLayer(cmp_PNT);
+    checkIfLoaded();
+  });
+
+  function checkIfLoaded(){
+    $('.loading-panel').fadeIn();
+    cmp_PNT.on("load", function(){
+        $('.loading-panel').fadeOut();
+      }
+    );
+  }
+    
+</script>
+
+</body>
+</html>
