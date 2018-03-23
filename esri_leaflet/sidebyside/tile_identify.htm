@@ -40,7 +40,7 @@
 
 <div id="map"></div>
 <div id="selectedFeatures" class="leaflet-bar">Click map for land use</div>
-<div id="selectedFeatures2" class="leaflet-bar">Click map for land use</div>
+<div id="selectedFeatures2" class="leaflet-bar">#2</div>
 
 <script>
 var map = L.map('map', {
@@ -51,7 +51,7 @@ var map = L.map('map', {
   var soil = L.esri.tiledMapLayer({
     url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/LandUse2015_P1/MapServer',
     layers: [0],
-    opacity: 0.7
+    opacity: 1
   }).addTo(map);
 
   var identifiedFeature;
@@ -69,9 +69,9 @@ var map = L.map('map', {
     .run(function(error, featureCollection){
       // make sure at least one feature was identified.
       if (featureCollection.features.length > 0) {
-        identifiedFeature = L.geoJSON(featureCollection.features[0]).addTo(map);
+     //   identifiedFeature = L.geoJSON(featureCollection.features[0]).addTo(map);
         var soilDescription =
-          featureCollection.features[0].properties.LU_Type +
+          featureCollection.features[0].properties.LU15CAT +
           ' - ' +
           featureCollection.features[0].properties.LU_Label;
         pane.innerHTML = soilDescription;
@@ -82,11 +82,11 @@ var map = L.map('map', {
     });
   });
 
-   var emp_cnt = L.esri.tiledMapLayer({
-    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/LandUse2010/MapServer',
-    opacity:.7 
+  var emp_cnt = L.esri.tiledMapLayer({
+    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/LandUse2015_Enhanced/MapServer',
+    opacity:1
   }).addTo(map);
-var identifiedFeature2;
+  var identifiedFeature2;
   var pane2 = document.getElementById('selectedFeatures2');
 
   map.on('click', function (e) {
@@ -101,28 +101,18 @@ var identifiedFeature2;
     .run(function(error, featureCollection){
       // make sure at least one feature was identified.
       if (featureCollection.features.length > 0) {
-        identifiedFeature2 = L.geoJSON(featureCollection.features[0]).addTo(map);
-        var soilDescription =
+       // identifiedFeature2 = L.geoJSON(featureCollection.features[0]).addTo(map);
+        var soilDescription2 =
           featureCollection.features[0].properties.LU_Type +
           ' - ' +
           featureCollection.features[0].properties.LU_Label;
-        pane2.innerHTML = soilDescription;
+        pane2.innerHTML = soilDescription2;
       }
       else {
         pane2.innerHTML = 'No features identified.';
       }
     });
   });
-
-
-
- /* emp_cnt.bindPopup(function (error, featureCollection) {
-    if(error || featureCollection.features.length === 0) {
-      return false;
-    } else {
-      return 'Employment Center Name: ' + featureCollection.features[0].properties.Name;
-    }
-  });  */
 
       L.control.sideBySide(soil,emp_cnt).addTo(map);
 </script>
