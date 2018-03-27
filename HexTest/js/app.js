@@ -1,27 +1,27 @@
 	$(document).ready(function() {
 	 loadImage();  
-	  $('#aboutModal').modal(); 
+	//  $('#aboutModal').modal(); 
 	  $('.form-control').change(function() {
 	    // If the load_image option was selected, call the loadImage() function
 	    if ($(this).val() == 'load_image') {
 	      loadImage();
-	      currentLayer = 'EMP2045';
+	      currentLayer = 'Exton16';
 	    }
 	    else {
 	       if ($(this).val() == 'load_image1') {
 	      loadImage1();
 
-	      currentLayer = 'ABS2045';
+	      currentLayer = 'Exton11';
 	     }
 		  else {
 	       if ($(this).val() == 'load_image2') {
 	      loadImage2();
-	      currentLayer = 'PER2045';
+	      currentLayer = 'Lind06';
 	    }
 	    else {
 	       if ($(this).val() == 'load_image3') {
 	      loadImage3();
-	      currentLayer = 'ABCHSQMI';
+	      currentLayer = 'Lind02';
 	    }
 	   }
 	  }
@@ -65,25 +65,25 @@
            : null;
     }
 
-  currentLayer = getParameterByName("l") || "EMP2045";
+  currentLayer = getParameterByName("l") || "Exton16";
   var getIMDColor = function(value) {
-  	layer = currentLayer || "EMP2045";
+  	layer = currentLayer || "Exton16";
     var series = {
-      "EMP2045": {
-        "breaks": [10000, 5000, 2500, 1000, 1],
-        "colors": ["#a63603","#e6550d","#fd8d3c","#fdbe85","#feedde"]
+      "Exton16": {
+        "breaks": [5, 4, 2, 1,0],
+        "colors": ["#253494","#2c7fb8","#41b6c4","#a1dab4","#ffffcc"]
       },
-      "ABS2045": {
-        "breaks": [ 3000, 2000, 1000, -0, -5000],
-        "colors": ['#54278f','#756bb1','#9e9ac8','#cbc9e2','#f2f0f7']
+      "Exton11": {
+        "breaks": [6, 3, 2, 1,0],
+        "colors": ["#253494","#2c7fb8","#41b6c4","#a1dab4","#ffffcc"]
       },
-	   "PER2045": {
-        "breaks": [.50000, .25000, .05, -.05001],
-        "colors": ['#045a8d','#2b8cbe','#74a9cf','#bdc9e1']
+	   "Lind06": {
+        "breaks": [19, 12, 6, 2,0],
+        "colors": ["#253494","#2c7fb8","#41b6c4","#a1dab4","#ffffcc"]
      },	
-      "ABCHSQMI": {
-        "breaks": [300, 200, 100, 0, -500],
-        "colors": ['#006d2c','#2ca25f','#66c2a4','#b2e2e2','#edf8fb']
+      "Lind02": {
+        "breaks": [26,17,9,3,0],
+        "colors": ["#253494","#2c7fb8","#41b6c4","#a1dab4","#ffffcc"]
      }
 	}
     for (var i=0; i < series[layer]["breaks"].length; i++){
@@ -100,9 +100,7 @@
       weight: 1,
       opacity: 1,
       fillOpacity: .75,
-      fillColor: (feature.properties) ?
-        getIMDColor(feature.properties[currentLayer]) :
-        null
+      fillColor: (feature.properties) ? getIMDColor(feature.properties[currentLayer]) : null
     }
   };
 
@@ -114,7 +112,6 @@
         layer.on({click:populateCounty});
         layer.on({
           click: tboro,
-        //  mouseover: highlightFeature,
           mouseover: hover,
           mouseout: resetHighlight
         });
@@ -122,7 +119,7 @@
 	  }
    });
 
-  	$.getJSON('data/emp2045.js', function (data) {
+  	$.getJSON('data/shed.js', function (data) {
     	lsoaLayer.addData(data);
     });
 
@@ -136,11 +133,11 @@
 		//	resetHighlight();
 		var layer = e.target;
 		var props = layer.feature.properties
-        var info = '<h1>' + props.Name + '</h1>';
+        var info = '<h1>' + props.Exton11 + '</h1>';
 		  
 		  var tableinfo = '<div id="tableinfo"><h4><b>Municipal-Level Employment Forecasts, 2015-2045</b></h4></div>'
 		  var content ='<table id="crashtable">'+
-					   '<tr><b><font color="#0074ad">'+ (props.MUN_NAME)+' , '+(props.CO_NAME)+' County</font></b></tr>'+
+					   '<tr><b><font color="#0074ad">'+ (props.Exton16)+' , '+(props.CO_NAME)+' County</font></b></tr>'+
 					   '<br>Absolute Change (2015-2045): <b>'+numeral(props.ABS2045).format('0,0')+'</b></br>'+
 					   'Percent Change (2015-2045): <b>'+numeral(props.PER2045).format('0.00%')+
 					   '</b><br>Absolute Change per Square Mile (2015-2045): <b>'+numeral(props.ABCHSQMI).format('0,0')+'</b>'+
@@ -158,7 +155,7 @@
 					   '<tr class="even">'+
 					   '<th>2040 Forecast</th><td>' + numeral(props.EMP2040).format('0,0')+ '</td>' + 
 					   '<tr class="odd">'+
-			           '<th>2045 Forecast</th><td>' + numeral(props.EMP2045).format('0,0')+ '</td>' + 
+			           '<th>2045 Forecast</th><td>' + numeral(props.Exton16).format('0,0')+ '</td>' + 
 			           '</tbody>'+						
 				       '<table>';
 	 var tableinfo2 = '<div id="tableinfo2"></br><h4><b>County-Level Employment Forecasts, 2015-2045</b></h4></div>'						   
@@ -228,8 +225,8 @@
         center: new L.LatLng(39.97, -75.16),
 		});
 			
-		var CartoDB_Positron = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-	        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+		var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
 	        subdomains: 'abcd',
 	        maxZoom: 19
 		});
