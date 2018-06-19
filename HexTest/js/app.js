@@ -10,25 +10,31 @@
 	    else {
 	       if ($(this).val() == 'load_image1') {
 	      loadImage1();
-
 	      currentLayer = 'Exton11';
+
 	     }
 		  else {
 	       if ($(this).val() == 'load_image2') {
 	      loadImage2();
 	      currentLayer = 'Lind06';
+
 	    }
 	    else {
 	       if ($(this).val() == 'load_image3') {
 	      loadImage3();
+	
 	      currentLayer = 'Lind02';
 	    }
 	   }
 	  }
 	 }
-	 lsoaLayer.setStyle(getIMDStyle);
+//	map.removeLayer(lsoaLayer)
+	lsoaLayer.setStyle(getIMDStyle);
+	
 	});
-	});	
+
+	});		
+
 
 	function loadImage(){
 	  $('#legendBox').css('backgroundImage', 'url(img/EMP1.png)');
@@ -36,11 +42,13 @@
 	  $('#legendBox').css('height', '145');
 	}
 	function loadImage1(){
+				  	map.addLayer(lsoaLayer);
 	  $('#legendBox').css('backgroundImage', 'url(img/EMP2.png)');
 	  $('#legendBox').css('width', '143');
 	  $('#legendBox').css('height', '145');
 	}
 	function loadImage2(){
+				  	map.addLayer(lsoaLayer);
 	  $('#legendBox').css('backgroundImage', 'url(img/EMP3.png)');
 	  $('#legendBox').css('width', '245');
 	  $('#legendBox').css('height', '95');
@@ -94,6 +102,7 @@
     return "#FFFFFF";
   }
 
+
   var getIMDStyle = function(feature) {
     return {
       color: '#666',
@@ -104,14 +113,21 @@
     }
   };
 
+  
   var lsoaLayer = L.geoJson(null, {
     style: getIMDStyle,
+//    filter: getFilter,
+ //   filter: function (feature, layer) {
+//			if (feature.properties) {
+				// If the property "underConstruction" exists and is true, return false (don't render features under construction)
+//				return feature.properties[currentLayer] === 0 ? false : true;
+//			}
+//			return false;
+//		},
     onEachFeature: function (feature, layer) {
       feature.id = L.stamp(layer);
       if (feature.properties) {
-        layer.on({click:populateCounty});
         layer.on({
-          click: tboro,
           mouseover: hover,
           mouseout: resetHighlight
         });
@@ -121,6 +137,7 @@
 
   	$.getJSON('data/shed.js', function (data) {
     	lsoaLayer.addData(data);
+    	lsoaLayer.addTo(map);
     });
 
     //////hack to resolve layerOrder add after layers added
@@ -129,63 +146,7 @@
 	   // lsoaLayer.off();                          //kill eventListener          
 	});
   
-  function tboro(e) {
-		//	resetHighlight();
-		var layer = e.target;
-		var props = layer.feature.properties
-        var info = '<h1>' + props.Exton11 + '</h1>';
-		  
-		  var tableinfo = '<div id="tableinfo"><h4><b>Municipal-Level Employment Forecasts, 2015-2045</b></h4></div>'
-		  var content ='<table id="crashtable">'+
-					   '<tr><b><font color="#0074ad">'+ (props.Exton16)+' , '+(props.CO_NAME)+' County</font></b></tr>'+
-					   '<br>Absolute Change (2015-2045): <b>'+numeral(props.ABS2045).format('0,0')+'</b></br>'+
-					   'Percent Change (2015-2045): <b>'+numeral(props.PER2045).format('0.00%')+
-					   '</b><br>Absolute Change per Square Mile (2015-2045): <b>'+numeral(props.ABCHSQMI).format('0,0')+'</b>'+
-			           '<tbody>'+
-			           '<tr class="odd">'+
-					   '<th>2015 Employment</th><td>' + numeral(props.EMP2015).format('0,0') + '</td>' + 
-					   '<tr class="even">'+
-					   '<th>2020 Forecast</th><td>' + numeral(props.EMP2020).format('0,0')+ '</td>' + 
-		               '<tr class="odd">'+
-			           '<th>2025 Forecast</th><td>' + numeral(props.EMP2025).format('0,0')+ '</td>' + 
-		               '<tr class="even">'+
-		               '<th>2030 Forecast</th><td>' + numeral(props.EMP2030).format('0,0')+ '</td>' + 
-					   '<tr class="odd">'+
-			           '<th>2035 Forecast</th><td>' + numeral(props.EMP2035).format('0,0')+ '</td>' + 
-					   '<tr class="even">'+
-					   '<th>2040 Forecast</th><td>' + numeral(props.EMP2040).format('0,0')+ '</td>' + 
-					   '<tr class="odd">'+
-			           '<th>2045 Forecast</th><td>' + numeral(props.Exton16).format('0,0')+ '</td>' + 
-			           '</tbody>'+						
-				       '<table>';
-	 var tableinfo2 = '<div id="tableinfo2"></br><h4><b>County-Level Employment Forecasts, 2015-2045</b></h4></div>'						   
-	 var content2 =   '<table id="crashtable">'+
-					   '<b><font color="#0074ad">'+ (props.CO_NAME)+" County" +'</font></b>'+
-					   '<br>Absolute Change (2015-2045): <b>'+numeral(props.cnty_abs45).format('0,0')+'</b></br>'+
-					   'Percent Change (2015-2045): <b>'+numeral(props.cnty_pct45).format('0.00%')+'</b>'+
-			           '<tbody>'+
-			           '<tr class="odd">'+
-					   '<th>2015 Employment</th><td>' + numeral(props.cnty2015).format('0,0') + '</td>' + 
-					   '<tr class="even">'+
-					   '<th>2020 Forecast</th><td>' + numeral(props.cnty2020).format('0,0')+ '</td>' + 
-		               '<tr class="odd">'+
-			           '<th>2025 Forecast</th><td>' + numeral(props.cnty2025).format('0,0')+ '</td>' + 
-		               '<tr class="even">'+
-		               '<th>2030 Forecast</th><td>' + numeral(props.cnty2030).format('0,0')+ '</td>' + 
-					   '<tr class="odd">'+
-			           '<th>2035 Forecast</th><td>' + numeral(props.cnty2035).format('0,0')+ '</td>' + 
-					   '<tr class="even">'+
-					   '<th>2040 Forecast</th><td>' + numeral(props.cnty2040).format('0,0')+ '</td>' + 
-					   '<tr class="odd">'+
-			           '<th>2045 Forecast</th><td>' + numeral(props.cnty2045).format('0,0')+ '</td>' + 
-			           '</tbody>'+						
-				       '<table>';
-			document.getElementById('infosidebarheader').innerHTML = tableinfo;
-			document.getElementById('infosidebar').innerHTML = content;
-			document.getElementById('infoside2barheader').innerHTML = tableinfo2;
-			document.getElementById('infosidebar2').innerHTML = content2;
-			$('#cardclick').hide();
-  		};
+
 		var label = new L.Label(); 
 
 		function hover(e) { 
@@ -200,8 +161,7 @@
 			
 		    if (!L.Browser.ie && !L.Browser.opera) {
 		        layer.bringToFront();
-		    }
-						
+		    }			
 		}
 					
 		function highlightFeature(e) {
@@ -216,9 +176,8 @@
 				
 		function resetHighlight(e) {
 		   lsoaLayer.resetStyle(e.target);
-		   	  info.update();
+		   info.update();
 		}
-
 
 		var map = L.map("map", {
         zoom: 9,
@@ -249,7 +208,6 @@
 			
 		//add layers after declaring them about line 195
 		map.addLayer(DVRPC);
-		map.addLayer(lsoaLayer);
 
 		var info = L.control();
 
@@ -267,72 +225,3 @@
 		};
 
 		info.addTo(map);
-
-
-        function populateCounty(e) {
-                var layer = e.target;
-                var props = layer.feature.properties,
-				CntyPop = ([props.cnty2015, props.cnty2020, props.cnty2025, props.cnty2030, props.cnty2035, props.cnty2040,props.cnty2045]);
-			    updatePopCnty(CntyPop)
-			 };
-       
-function updatePopCnty(Values){
-    var CntyChart = {
-        chart: {
-            renderTo: 'containerCtyPop',
-            type: 'line',
-            backgroundColor: 'white',
-            height: 250,
-            marginTop: 10,
-           // width: 290,
-        },
-        title: {
-            text: '',
-            x: -0 //center
-       	 },	
-		   xAxis: {
-            categories: ['2015', '2020', '2025', '2030', '2035', '2040','2045']
-        },
-		  	colors: ['#0074ad'],
-            yAxis: {
-                title: {
-                    text: 'Population'
-                }
-            },
-			 legend:{
-			enabled: false
-		},
-		 tooltip: {
-            formatter:function(){
-
-                return Highcharts.numberFormat(this.point.y,0,',',',')+'</b><br/>';
-            }
-        },
-        credits: {
-            enabled: false
-        },
-  /*      plotOptions: {
-            line: {
-                dataLabels: {
-                    enabled: true
-                },
-                enableMouseTracking: true
-            }
-        },*/
-        series: [{
-           name:'Population',
-		   id: 'Values',
-           data: []
-        }]
-    };
-    var Labels = ["2015", "2020", "2025", "2030","2035", "2040", "2045"],
-    countData2 = [];
-    for (var i = 0; i < Values.length; i++){
-                countData2.push({
-                    name: Labels[i],
-                    y: Values[i]})
-            }
-    CntyChart.series[0].data = countData2;
-    var chart2 = new Highcharts.Chart(CntyChart)
-
-}
