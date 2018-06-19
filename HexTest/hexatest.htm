@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>DVRPC Station Shed Inventory - Hex-a-test</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+
+     <!-- lets load Leaflet's .js and .css from CDN-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+
+    <!-- Core CSS -->
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+     
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+    <!-- Load Esri Leaflet from CDN.  it has no .css stylesheet of its own, only .js -->
+    <script src="https://unpkg.com/esri-leaflet@2.0.4/dist/esri-leaflet.js"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+    #legendBox {
+    position: absolute;
+    background:white;
+    height:240px;
+    width:210px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+    #download_button{
+      margin-left:80px;
+    }
+
+    /* loading styles */
+    .loading-panel {
+      background-color: rgba(239, 239, 239, 0.26);
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 1048;
+      transition: all .3s ease-out;
+    }
+    /*!
+     * Load Awesome v1.1.0 (http://github.danielcardoso.net/load-awesome/)
+     * Copyright 2015 Daniel Cardoso <@DanielCardoso>
+     * Licensed under MIT
+     */
+    .spin-item{
+        margin: 25% auto;
+        top: 100px;
+        width: 80px;
+    }
+    .la-ball-spin-clockwise,
+    .la-ball-spin-clockwise > div {
+        position: relative;
+        -webkit-box-sizing: border-box;
+           -moz-box-sizing: border-box;
+                box-sizing: border-box;
+    }
+
+    .la-ball-spin-clockwise {
+        display: block;
+        font-size: 0;
+        color: #312867;
+    }
+
+    .la-ball-spin-clockwise.la-dark {
+        color: #333;
+    }
+
+    .la-ball-spin-clockwise > div {
+        display: inline-block;
+        float: none;
+        background-color: currentColor;
+        border: 0 solid currentColor;
+    }
+
+    .la-ball-spin-clockwise {
+        width: 32px;
+        height: 32px;
+    }
+
+    .la-ball-spin-clockwise > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 8px;
+        height: 8px;
+        margin-top: -4px;
+        margin-left: -4px;
+        border-radius: 100%;
+        -webkit-animation: ball-spin-clockwise 1s infinite ease-in-out;
+           -moz-animation: ball-spin-clockwise 1s infinite ease-in-out;
+             -o-animation: ball-spin-clockwise 1s infinite ease-in-out;
+                animation: ball-spin-clockwise 1s infinite ease-in-out;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(1) {
+        top: 5%;
+        left: 50%;
+        -webkit-animation-delay: -.875s;
+           -moz-animation-delay: -.875s;
+             -o-animation-delay: -.875s;
+                animation-delay: -.875s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(2) {
+        top: 18.1801948466%;
+        left: 81.8198051534%;
+        -webkit-animation-delay: -.75s;
+           -moz-animation-delay: -.75s;
+             -o-animation-delay: -.75s;
+                animation-delay: -.75s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(3) {
+        top: 50%;
+        left: 95%;
+        -webkit-animation-delay: -.625s;
+           -moz-animation-delay: -.625s;
+             -o-animation-delay: -.625s;
+                animation-delay: -.625s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(4) {
+        top: 81.8198051534%;
+        left: 81.8198051534%;
+        -webkit-animation-delay: -.5s;
+           -moz-animation-delay: -.5s;
+             -o-animation-delay: -.5s;
+                animation-delay: -.5s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(5) {
+        top: 94.9999999966%;
+        left: 50.0000000005%;
+        -webkit-animation-delay: -.375s;
+           -moz-animation-delay: -.375s;
+             -o-animation-delay: -.375s;
+                animation-delay: -.375s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(6) {
+        top: 81.8198046966%;
+        left: 18.1801949248%;
+        -webkit-animation-delay: -.25s;
+           -moz-animation-delay: -.25s;
+             -o-animation-delay: -.25s;
+                animation-delay: -.25s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(7) {
+        top: 49.9999750815%;
+        left: 5.0000051215%;
+        -webkit-animation-delay: -.125s;
+           -moz-animation-delay: -.125s;
+             -o-animation-delay: -.125s;
+                animation-delay: -.125s;
+    }
+
+    .la-ball-spin-clockwise > div:nth-child(8) {
+        top: 18.179464974%;
+        left: 18.1803700518%;
+        -webkit-animation-delay: 0s;
+           -moz-animation-delay: 0s;
+             -o-animation-delay: 0s;
+                animation-delay: 0s;
+    }
+
+    .la-ball-spin-clockwise.la-sm {
+        width: 16px;
+        height: 16px;
+    }
+
+    .la-ball-spin-clockwise.la-sm > div {
+        width: 4px;
+        height: 4px;
+        margin-top: -2px;
+        margin-left: -2px;
+    }
+
+    .la-ball-spin-clockwise.la-2x {
+        width: 64px;
+        height: 64px;
+    }
+
+    .la-ball-spin-clockwise.la-2x > div {
+        width: 16px;
+        height: 16px;
+        margin-top: -8px;
+        margin-left: -8px;
+    }
+
+    .la-ball-spin-clockwise.la-3x {
+        width: 96px;
+        height: 96px;
+    }
+
+    .la-ball-spin-clockwise.la-3x > div {
+        width: 24px;
+        height: 24px;
+        margin-top: -12px;
+        margin-left: -12px;
+    }
+
+    /*
+     * Animation
+     */
+    @-webkit-keyframes ball-spin-clockwise {
+        0%,
+        100% {
+            opacity: 1;
+            -webkit-transform: scale(1);
+                    transform: scale(1);
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 0;
+            -webkit-transform: scale(0);
+                    transform: scale(0);
+        }
+    }
+    @-moz-keyframes ball-spin-clockwise {
+        0%,
+        100% {
+            opacity: 1;
+            -moz-transform: scale(1);
+                 transform: scale(1);
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 0;
+            -moz-transform: scale(0);
+                 transform: scale(0);
+        }
+    }
+    @-o-keyframes ball-spin-clockwise {
+        0%,
+        100% {
+            opacity: 1;
+            -o-transform: scale(1);
+               transform: scale(1);
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 0;
+            -o-transform: scale(0);
+               transform: scale(0);
+        }
+    }
+    @keyframes ball-spin-clockwise {
+        0%,
+        100% {
+            opacity: 1;
+            -webkit-transform: scale(1);
+               -moz-transform: scale(1);
+                 -o-transform: scale(1);
+                    transform: scale(1);
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 0;
+            -webkit-transform: scale(0);
+               -moz-transform: scale(0);
+                 -o-transform: scale(0);
+                    transform: scale(0);
+        }
+    }
+
+
+  </style>
+</head>
+<body>
+
+<div id="map">
+    <div id="legendBox">
+      <div class="panel-group">
+        <div class="panel panel-default">
+          <div class="panel-collapse collapse in" id="overlay-layers">
+            <div class="panel-body" style="padding: 0px 15px;">
+              <div class="radio">
+                <label><input checked="checked"  data-value="99,99" name="optradio" type="radio" value="0">None</label>
+              </div>
+              <h5>SEPTA</h5>
+              <div class="radio">
+                <label><input data-value="0" name="optradio" type="radio" value="1">Exton (2016)</label>
+              </div>
+              <div class="radio">
+                <label><input data-value="1" name="optradio" type="radio" value="2">Exton (2011)</label>
+              </div>
+              <h5>PATCO</h5>
+               <div class="radio">
+                <label><input data-value="2" name="optradio" type="radio" value="3">Lindenwold (2006)</label>
+              </div>
+              <div class="radio">
+                <label><input data-value="3" name="optradio" type="radio" value="4">Lindenwold (2002)</label>
+              </div>
+            
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="loading-panel stat-map" style="display:none;"><div class="spin-item"><div class="item-inner"><div class="item-loader-container"><div class="la-ball-spin-clockwise la-2x"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div></div></div></div>
+  </div>
+
+<script>
+  var SHED;
+  var tg = 0;
+  var map = L.map('map', {
+    zoom: 9,
+    minZoom:8,
+    maxZoom:17,
+    center: new L.LatLng(39.97, -75.16),
+  });
+
+  // Basemap Layers
+var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+}).addTo(map);
+
+ // googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+ //   maxZoom: 20,
+ //   subdomains:['mt0','mt1','mt2','mt3']
+ // }).addTo(map);
+
+  county = L.esri.featureLayer({
+        url: 'https://arcgis.dvrpc.org/arcgis/rest/services/Boundaries/DVRPC_Boundaries/FeatureServer/1',
+        simplifyFactor: 0.5,
+        precision: 5,
+        style: {
+            color: '#d9d9d9',
+            weight: 3,
+            fill: false,
+            opacity: 0.5,
+            clickable: false
+        }
+    }).addTo(map);
+
+   mcd = L.esri.featureLayer({
+        url: 'https://arcgis.dvrpc.org/arcgis/rest/services/Boundaries/DVRPC_Boundaries/FeatureServer/2',
+        simplifyFactor: 0.5,
+        precision: 5,
+        style: {
+            color: '#adadad',
+            weight: 1.5,
+            fill: false,
+            opacity: 0.5,
+            clickable: false
+        }
+    }).addTo(map);
+
+  rail = L.esri.featureLayer({
+        url: 'https://arcgis.dvrpc.org/arcgis/rest/services/Transportation/PassengerRail/FeatureServer/0',
+        simplifyFactor: 0.5,
+        precision: 5,
+        style: {
+            color: '#636363',
+            weight: 3,
+            opacity: 0.5,
+            clickable: false
+        }
+    }).addTo(map);
+
+// Other Stations 
+    styleOptions2 = {
+    //  color: "#587272",
+    color:"#fc8d59",
+      radius: 3,
+      weight: 0,
+      opacity: 1,
+      fillOpacity: 1,
+      clickable: false
+    };
+ 
+    var other = L.geoJson(null, {
+        pointToLayer: function(feature, latlng) {
+            return L.circleMarker(latlng, styleOptions2);
+        }
+       // onEachFeature: function(feature, layer) {
+        //    if (feature.properties) {
+       //         layer.bindLabel(feature.properties.STATION, {
+       //             className: 'leaflet-label2'
+       //         });
+             //   layer.on({click: identify});
+             //   layer.on({click: populatebarchart});
+       // } 
+    //  }
+    });
+    $.getJSON('https://opendata.arcgis.com/datasets/68b970bf65bc411c8a7f8f7b0bb7908d_0.geojson', function(data) {
+        other.addData(data);
+        other.addTo(map);
+    });
+
+
+  SHED = L.esri.dynamicMapLayer({
+    url : 'https://arcgis.dvrpc.org/arcgis/rest/services/AppData/SHED/MapServer',
+    layers : [99,100]
+  }); 
+
+  var tile_group = L.layerGroup().addTo(map);
+  tile_group.addLayer(SHED);
+  checkIfLoaded();
+
+
+  $('input[type=radio][name=optradio]').on('change', function(){
+    var layer_ids = $(this).attr('data-value');
+    
+    SHED = L.esri.dynamicMapLayer({
+      url : 'https://arcgis.dvrpc.org/arcgis/rest/services/AppData/SHED/MapServer',
+      layers : [layer_ids[0]],
+      opacity : .80
+    }); 
+
+    //add new tiles to overlay group
+    tile_group.clearLayers().addLayer(SHED);
+    checkIfLoaded();
+  });
+
+  function checkIfLoaded(){
+    $('.loading-panel').fadeIn();
+    SHED.on("load", function(){
+        $('.loading-panel').fadeOut();
+      }
+    );
+  }
+    
+</script>
+
+</body>
+</html>

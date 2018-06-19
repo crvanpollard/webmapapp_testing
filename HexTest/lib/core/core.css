@@ -1,0 +1,18 @@
+html,body, #container {
+    height: 100%;
+}
+body {
+    padding-top: 50px;
+  /*  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; */
+  font-family:"Open Sans", sans-serif;
+  overflow: auto;
+}
+ #map, #sidebar {
+    height: 98%;
+    margin: 15px 0px 0px 0px ;
+}
+.logo-container {
+    display: inline-block;
+    padding: 0px 10px 0px 10px;
+    margin: 0px 0px 0px 0px;
+}
