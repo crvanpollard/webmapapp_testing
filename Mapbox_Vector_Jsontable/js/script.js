@@ -76,9 +76,18 @@ map.addControl(new mapboxgl.NavigationControl());
 
 
 
-
-
 map.on('load', function() {
+
+  var layers = map.getStyle().layers;
+// Find the index of the first symbol layer in the map style
+var firstSymbolId;
+for (var i = 0; i < layers.length; i++) {
+if (layers[i].type === 'line') {
+firstSymbolId = layers[i].id;
+break;
+}
+}
+ // this.map.addLayer(layers.cmp, "water shadow");
   map.addLayer({
     'id': 'county-outline',
     'type': 'line',
@@ -104,7 +113,7 @@ map.on('load', function() {
     'paint': {
         'fill-opacity': 1
     }
-  })
+  }, "landcover_crop")
 
   map.addLayer({
     'id': 'municipality-outline',
@@ -158,12 +167,12 @@ map.on('load', function() {
   csvData.forEach(function(row) {
       let data = row["EMIACRE"],
       color
-    if (data < 10) color = '#d73027'
-    else if (data >= 10 && data < 20) color = '#fc8d59'
-    else if (data >=20 && data < 40) color = '#fee090'
-    else if (data >= 40 && data < 80) color = '#e0f3f8'
-    else if (data >= 80 && data < 150) color ='#91bfdb'
-    else { color = '#4575b4'; }
+    if (data < 10) color = '#1a9850'
+    else if (data >= 10 && data < 20) color = '#91cf60'
+    else if (data >=20 && data < 40) color = '#d9ef8b'
+    else if (data >= 40 && data < 80) color = '#fee08b'
+    else if (data >= 80 && data < 150) color ='#fc8d59'
+    else { color = '#d73027'; }
     expression.push(row['geoid'].toString(), color);
   });
   
