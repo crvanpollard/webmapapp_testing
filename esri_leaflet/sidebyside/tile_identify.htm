@@ -1,0 +1,121 @@
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>Identifying Imagery</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
+
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+  <script src="leaflet-side-by-side.js"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; width: 100%; }
+  </style>
+</head>
+<body>
+
+<style>
+  #selectedFeatures {
+    position: absolute;
+    bottom: 30px;
+    left: 10px;
+    z-index: 1000;
+    background: white;
+    padding: 1em;
+  }
+    #selectedFeatures2 {
+    position: absolute;
+    bottom: 30px;
+    right: 10px;
+    z-index: 1000;
+    background: white;
+    padding: 1em;
+  }
+</style>
+
+<div id="map"></div>
+<div id="selectedFeatures" class="leaflet-bar">Click map for land use</div>
+<div id="selectedFeatures2" class="leaflet-bar">#2</div>
+
+<script>
+var map = L.map('map', {
+   // minZoom: 5
+  }).setView([39.97, -75.16], 10);
+  L.esri.basemapLayer('Gray').addTo(map);
+
+  var soil = L.esri.tiledMapLayer({
+    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/LandUse2015_P1/MapServer',
+    layers: [0],
+    opacity: 1
+  }).addTo(map);
+
+  var identifiedFeature;
+  var pane = document.getElementById('selectedFeatures');
+
+  map.on('click', function (e) {
+ //   pane.innerHTML = 'Loading';
+    if (identifiedFeature){
+      map.removeLayer(identifiedFeature);
+    }
+    soil.identify()
+    .on(map)
+    .at(e.latlng)
+    .layers ('top')
+    .run(function(error, featureCollection){
+      // make sure at least one feature was identified.
+      if (featureCollection.features.length > 0) {
+     //   identifiedFeature = L.geoJSON(featureCollection.features[0]).addTo(map);
+        var soilDescription =
+          featureCollection.features[0].properties.LU15CAT +
+          ' - ' +
+          featureCollection.features[0].properties.LU_Label;
+        pane.innerHTML = soilDescription;
+      }
+      else {
+        pane.innerHTML = 'No features identified.';
+      }
+    });
+  });
+
+  var emp_cnt = L.esri.tiledMapLayer({
+    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/LandUse2015_Enhanced/MapServer',
+    opacity:1
+  }).addTo(map);
+  var identifiedFeature2;
+  var pane2 = document.getElementById('selectedFeatures2');
+
+  map.on('click', function (e) {
+  //  pane2.innerHTML = 'Loading';
+    if (identifiedFeature2){
+      map.removeLayer(identifiedFeature2);
+    }
+    emp_cnt.identify()
+    .on(map)
+    .at(e.latlng)
+    .layers ('top')
+    .run(function(error, featureCollection){
+      // make sure at least one feature was identified.
+      if (featureCollection.features.length > 0) {
+       // identifiedFeature2 = L.geoJSON(featureCollection.features[0]).addTo(map);
+        var soilDescription2 =
+          featureCollection.features[0].properties.LU_Type +
+          ' - ' +
+          featureCollection.features[0].properties.LU_Label;
+        pane2.innerHTML = soilDescription2;
+      }
+      else {
+        pane2.innerHTML = 'No features identified.';
+      }
+    });
+  });
+
+      L.control.sideBySide(soil,emp_cnt).addTo(map);
+</script>
+
+</body>
+</html>

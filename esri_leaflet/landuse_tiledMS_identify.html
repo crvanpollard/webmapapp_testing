@@ -1,0 +1,81 @@
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>Identifying Features</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
+
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+  </style>
+</head>
+<body>
+
+<style>
+  #selectedFeatures {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background: white;
+    padding: 1em;
+  }
+  .leaflet-bar.map-text a {
+    color: #79BD8F;
+    display: inline;
+  }
+</style>
+
+<div id="map"></div>
+<div id="selectedFeatures" class="leaflet-bar map-text">Click on the map for Land Use Info
+</div>
+<script>
+  var map = L.map('map', {
+   // minZoom: 5
+  }).setView([39.97, -75.16], 10);
+  L.esri.basemapLayer('Gray').addTo(map);
+
+  var landuse = L.esri.tiledMapLayer({
+    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/LandUse2015_P1/MapServer',
+    layers: [0],
+    opacity: 0.7
+  }).addTo(map);
+
+  var identifiedFeature;
+  var pane = document.getElementById('selectedFeatures');
+
+  map.on('click', function (e) {
+    pane.innerHTML = 'Loading';
+    if (identifiedFeature){
+      map.removeLayer(identifiedFeature);
+    }
+    landuse.identify()
+    .on(map)
+    .at(e.latlng)
+    .layers ('top')
+    .run(function(error, featureCollection){
+      // make sure at least one feature was identified.
+      if (featureCollection.features.length > 0) {
+        identifiedFeature = L.geoJSON(featureCollection.features[0]).addTo(map);
+        var landuseDescription =
+          featureCollection.features[0].properties.LU_Type +
+          ' - ' +
+          featureCollection.features[0].properties.LU_Label;
+        pane.innerHTML = landuseDescription;
+      }
+      else {
+        pane.innerHTML = 'No features identified.';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

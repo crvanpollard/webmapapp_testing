@@ -1,0 +1,115 @@
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>ESRI-Leaflet Identify (Drill Down)</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
+
+    <!-- Core CSS -->
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+   
+
+  <!-- Load Esri Leaflet from CDN -->
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+    #legendBox {
+    position: absolute;
+    background:white;
+    height:450px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+  </style>
+</head>
+<body>
+
+<div id="map">
+<div id="legendBox">
+<div id="infosidebar"style="padding:10px"></div> 
+</div>
+</div>
+
+<script>
+  // sample server in this example is not CORS enabled, so use JSONP
+    L.esri.get = L.esri.get.JSONP;
+
+   var map = L.map('map', {
+            zoom: 9,
+            minZoom:8,
+            maxZoom:17,
+            center: new L.LatLng(39.97, -75.16),
+      });
+
+  googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+  maxZoom: 20,
+  subdomains:['mt0','mt1','mt2','mt3']
+  }).addTo(map);
+
+  var landuse = L.esri.tiledMapLayer({
+    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/LandUse2015_P1/MapServer',
+    layers: [0],
+    opacity: 0.7
+  }).addTo(map);
+
+  var identifiedFeature;
+  var pane = document.getElementById('infosidebar');
+
+  map.on('click', function (e) {
+    pane.innerHTML = 'Loading';
+    if (identifiedFeature){
+      map.removeLayer(identifiedFeature);
+    }
+    landuse.identify()
+    .on(map)
+    .at(e.latlng)
+    .layers ('top')
+    .run(function(error, featureCollection){
+      // make sure at least one feature was identified.
+      if (featureCollection.features.length > 0) {
+        identifiedFeature = L.geoJSON(featureCollection.features[0]).addTo(map);
+        var landuseDescription =
+          featureCollection.features[0].properties.LU_Type +
+          ' - ' +
+          featureCollection.features[0].properties.LU_Label;
+        pane.innerHTML = landuseDescription;
+      }
+      else {
+        pane.innerHTML = 'No features identified.';
+      }
+    });
+  });
+
+  var emp_cnt = L.esri.dynamicMapLayer({
+    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/Planning/EmploymentCenters/MapServer',
+    opacity:.5 
+  }).addTo(map);
+
+  emp_cnt.bindPopup(function (error, featureCollection) {
+    if(error || featureCollection.features.length === 0) {
+      return false;
+    } else {
+      return 'Employment Center Name: ' + featureCollection.features[0].properties.Name;
+    }
+  });
+
+</script>
+
+</body>
+</html>
