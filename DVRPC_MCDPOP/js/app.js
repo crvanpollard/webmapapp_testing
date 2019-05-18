@@ -47,19 +47,6 @@
 
 	$('#legendBox').appendTo('#map');
 
-	 $('select option[name="layer"]').click(function(){
-          currentLayer = $(this).data("layer");
-          if (currentLayer == "none") {
-            map.removeLayer(lsoaLayer);
-          } else {
-            if (!map.hasLayer(lsoaLayer)){
-              map.addLayer(lsoaLayer);
-            } else {
-              lsoaLayer.setStyle(getIMDStyle);
-            }
-          }
-        });
-
   var map;
   var props;
     
@@ -283,7 +270,18 @@
 
   	//	var showInfo = !(getParameterByName("info") == "false");
 
-       
+        $('select option[name="layer"]').click(function(){
+          currentLayer = $(this).data("layer");
+          if (currentLayer == "none") {
+            map.removeLayer(lsoaLayer);
+          } else {
+            if (!map.hasLayer(lsoaLayer)){
+              map.addLayer(lsoaLayer);
+            } else {
+              lsoaLayer.setStyle(getIMDStyle);
+            }
+          }
+        });
 
         function populateCounty(e) {
               //  lsoaLayer.setStyle({fillColor: "#396ab2"});
@@ -355,8 +353,8 @@
     MCDChart.series[0].data = countData;
     var chart = new Highcharts.Chart(MCDChart)
 
-} */
-
+}
+*/
 function updatePopCnty(Values){
     var CntyChart = {
         chart: {
