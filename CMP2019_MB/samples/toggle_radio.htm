@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Filter symbols by toggling a list</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<!-- Load Esri Leaflet from CDN -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; };
+</style>
+</head>
+<body>
+<style>
+      #legendBox {
+    position: absolute;
+    background:white;
+    height:300px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+</style>
+<div id="map"></div>
+<div id="legendBox">
+      <div class="panel-group">
+        <div class="panel panel-default">
+          <div class="panel-collapse collapse in" id="overlay-layers">
+            <div class="panel-body" style="padding: 0px 15px;">
+          
+           <div class='row' id='filters'>
+        <input id='all' type='radio' name='toggle' value='all' checked='checked'>
+        <label for='all'>None</label>
+        <input id='TTI' type='radio' name='toggle' value='TTI'>
+        <label for='TTI'>TTI</label>
+        <input id='PTI' type='radio' name='toggle' value='PTI'>
+        <label for='PTI'>PTI</label>
+
+      </div>
+
+           
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+<script>
+var TTI, PTI, all;
+
+document.getElementById('filters').addEventListener('change', function(e) {
+      var day = e.target.value;
+      // update the map filter
+      if (day === 'TTI') {
+       // alert(day);
+       map.setLayoutProperty(day, 'visibility', 'visible');
+      } else if (day === 'PTI') {
+      //  alert(day);
+               map.setLayoutProperty('TTI','visibility', 'none');
+       map.setLayoutProperty(day, 'visibility', 'visible');
+      } else if (day === 'all') {
+      //  alert(day);
+       map.setLayoutProperty('TTI','visibility', 'none');
+        map.setLayoutProperty('PTI','visibility', 'none');
+      } else {
+    //    console.log('error');
+        map.setLayoutProperty('TTI', 'visibility', 'none');
+      };
+
+
+    //  map.setLayoutProperty(day, 'visibility', 'none');
+    });
+/*$(document).ready(function () {
+
+    $('#TTI').click(function () {
+        if ($(this).is(':checked')) {
+            map.setLayoutProperty(TTI, 'visibility', 'visible');
+            }
+            else
+            {
+            map.setLayoutProperty(TTI, 'visibility', 'none');
+            }
+
+    });
+
+    $('#none').click(function () {
+        if ($(this).is(':checked')) {
+            alert("Transfer Thai Gayo");
+        }
+    });
+});
+
+
+  function toggleLayer(id)
+        {
+            if ($('#'+id).is(':checked')) {
+              console.log(id);
+            map.setLayoutProperty(id, 'visibility', 'visible');
+            }
+            else
+            {
+            map.setLayoutProperty(id, 'visibility', 'none');
+            }
+        }
+*/
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
+  
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [ -75.170669,39.950143], 
+        zoom: 9
+    });
+
+
+    map.on('load', function() {
+
+    map.addLayer({
+        id: "TTI",
+        type: "line",
+        source: {
+            "type": "geojson",
+            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TTI+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+        },
+        layout: {
+            "visibility":"none",
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        paint: {
+           "line-color":
+                [
+                "case",
+                  ["==", ["get", "TTI"], .5],
+                  "#f5b041",
+                  ["==", ["get", "TTI"], 1],
+                  "#cb4335",
+                  "#cccccc"
+                ],
+            "line-width":
+                [
+                "case",
+                  ["==", ["get", "TTI"], .5],
+                  6,
+                  ["==", ["get", "TTI"], 1],
+                  2,
+                  0
+                ],
+                   "line-opacity":
+                [
+                "case",
+                  ["==", ["get", "TTI"], .5],
+                  .4,
+                  ["==", ["get", "TTI"], 1],
+                  .8,
+                  0
+                ],
+        }
+    });
+
+ map.addLayer({
+        id: "PTI",
+        type: "line",
+        source: {
+            "type": "geojson",
+            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=PTI+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+        },
+        layout: {
+            "visibility":"none",
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        paint: {
+           "line-color":
+                [
+                "case",
+                  ["==", ["get", "PTI"], .5],
+                  "#f5b041",
+                  ["==", ["get", "PTI"], 1],
+                  "#cb4335",
+                  "#cccccc"
+                ],
+            "line-width":
+                [
+                "case",
+                  ["==", ["get", "PTI"], .5],
+                  6,
+                  ["==", ["get", "PTI"], 1],
+                  2,
+                  0
+                ],
+                   "line-opacity":
+                [
+                "case",
+                  ["==", ["get", "PTI"], .5],
+                  .4,
+                  ["==", ["get", "PTI"], 1],
+                  .8,
+                  0
+                ],
+        }
+    });
+
+
+
+    });
+
+
+/*
+$('input[type=radio][name=optradio]').on('change', function(){
+    
+
+    if(checkboxTTI_PM.checked){
+     // map.setLayoutProperty(id, 'visibility', 'visible');
+            alert(map);
+    } else {
+    //   map.setLayoutProperty(id, 'visibility', 'none');
+    }
+
+    if(checkboxLRP_VC.checked){
+      LRP_VC_PM.addTo(map);
+    } else {
+      map.removeLayer(LRP_VC_PM);
+    }
+
+    if(checkboxTransScore.checked){
+      TransScore_PM.addTo(map);
+      RailPoint_PM.addTo(map);
+    } else {
+      map.removeLayer(TransScore_PM);
+      map.removeLayer(RailPoint_PM);
+    }
+
+    if(checkboxPTI.checked){
+      PTI_PM.addTo(map);
+    } else {
+      map.removeLayer(PTI_PM);
+    }
+
+    if(checkboxNHSPoint.checked){
+      NHSPoint_PM.addTo(map);
+      FreightPo_PM.addTo(map);
+      RailLinePo_PM.addTo(map);
+    } else {
+      map.removeLayer(NHSPoint_PM);
+      map.removeLayer(FreightPo_PM);
+      map.removeLayer(RailLinePo_PM);
+    }
+
+     if(checkboxTransitPoi.checked){
+      TransitPoi_PM.addTo(map);
+    } else {
+      map.removeLayer(TransitPoi_PM);
+    }
+
+     if(checkboxHighCrSev.checked){
+      HighCrSev_PM.addTo(map);
+    } else {
+      map.removeLayer(HighCrSev_PM);
+    }
+
+    if(checkboxHighCrFreq.checked){
+      HighCrFreq_PM.addTo(map);
+    } else {
+      map.removeLayer(HighCrFreq_PM);
+    }
+
+    if(checkboxTTTI.checked){
+      TTTI_PM.addTo(map);
+    } else {
+      map.removeLayer(TTTI_PM);
+    }
+
+     if(checkboxHvyTran.checked){
+      HvyTran_PM.addTo(map);
+      Limerick_PM.addTo(map);
+      MajBridge_PM.addTo(map);
+      Bridges_PM.addTo(map);
+      Military_PM.addTo(map);
+    } else {
+      map.removeLayer(HvyTran_PM);
+      map.removeLayer(Limerick_PM);
+      map.removeLayer(MajBridge_PM);
+      map.removeLayer(Bridges_PM);
+      map.removeLayer(Military_PM);
+    }
+
+    if(checkboxHHDen.checked){
+      HHDen_PM.addTo(map);
+      EmpDen_PM.addTo(map);
+      StadGathr_PM.addTo(map);
+    } else {
+      map.removeLayer(HHDen_PM);
+      map.removeLayer(EmpDen_PM);
+      map.removeLayer(StadGathr_PM);
+    }
+
+    if(checkboxEnv.checked){
+      Env_PM.addTo(map);
+    } else {
+      map.removeLayer(Env_PM);
+    }
+
+    if(checkboxInfEmerg.checked){
+      InfEmerg_PM.addTo(map);
+    } else {
+      map.removeLayer(InfEmerg_PM);
+    }
+
+    if(checkboxPlanCntr.checked){
+      PlanCntr_PM.addTo(map);
+    } else {
+      map.removeLayer(PlanCntr_PM);
+    }
+
+   if(checkboxLOTTR.checked){
+      LOTTR_PM.addTo(map);
+    } else {
+      map.removeLayer(LOTTR_PM);
+    }
+
+  if(checkboxPHED.checked){
+      PHED_PM.addTo(map);
+    } else {
+      map.removeLayer(PHED_PM);
+    }
+
+  if(checkboxTTTR.checked){
+      TTTR_PM.addTo(map);
+    } else {
+      map.removeLayer(TTTR_PM);
+    }        
+  }); */
+
+</script>
+
+</body>
+</html>
