@@ -1,16 +1,5 @@
-  var exp_rd;
-  var TSP;
   var RSE;
-
-  //  color = feature.getProperty("VisionType") == 'Roadway - Funded' ? '#24527F' : '#90ABD9'
-  // dark blue  #24527F  rgb(36,82,127)
-  // light blue #90ABD9 rgb(144,171,217)
-
- //   color = feature.getProperty("VisionType") == 'Transit - Funded' 
- // dark green '#69883A' rgb(105,136,58)
- // light green '#B4CA8B' rgb(180,202,139)
- // 'Externally Funded' ? '#795300' : '#B4CA8B'
-
+  var CMP_PA;
   var menu = document.getElementById('menu');
   var info = document.getElementById('info');
   var geojson;
@@ -60,8 +49,8 @@
     container: "map", 
     style: 'mapbox://styles/mapbox/light-v9', 
     center: [ -75.170669,39.950143], 
-    bearing: 20, // Rotate Philly ~9° off of north, thanks Billy Penn.
-    pitch: 50,
+    bearing: 0, // Rotate Philly ~9° off of north, thanks Billy Penn.
+    pitch: 0,
     zoom: 9,
      attributionControl: false
   });
@@ -76,8 +65,8 @@
             center: [-75.170669,39.950143], 
             zoom: 9,
             speed: 0.1,
-            bearing: -5,
-            pitch: 35
+            bearing: 0,
+            pitch: 0
           });
         }
       }
@@ -95,92 +84,78 @@ document.getElementById('export').addEventListener('click', function () {
         center: [ -75.170669,39.950143], 
             zoom: 9,
             speed: 0.5,
-            bearing: -5,
-            pitch: 35
+            bearing: 0,
+            pitch: 0
     });
 });
 
-// curb cuts layer
+
+// walk about layer
 map.on('load', function () {
 
-    map.addLayer({
-        'id': 'TSP',
-        'type': 'circle',
-        'source': {
-            'type': 'geojson',
-            'data': TSP
+  map.addLayer({
+  id: "CMP_PA",
+  type: "fill",
+  source: {
+            "type": "geojson",
+            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=" 
         },
-        'paint': {
-            'circle-radius': 4,
-            'circle-stroke-color' : '#ffffff',
-            'circle-stroke-width': 1,
-            'circle-color': 'rgba(105,136,58,.8)'
-           
-            }
-        });
-      map.addLayer({
-        "id": "TSP-hover",
-        'type': 'circle',
-        'source': {
-            'type': 'geojson',
-            'data': TSP
-        },
-        'paint': {
-            'circle-radius': 6,
-          //  'circle-stroke-color' : '#ffffff',
-          //  'circle-stroke-width': 1,
-            'circle-color': 'red'
-           
-        },
-        "filter": ["==", "FACILITY", ""]
-    });
+  layout: {
+   visibility: "visible"
+  },
+  paint: {
+    "fill-color": [
+        "case",
+        ["==", ["get", "CMP_ID"], 1],"#92D3C8",
+        ["==", ["get", "CMP_ID"], 2],"#F37D80",
+        ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
+        ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
+        ["==", ["get", "CMP_ID"], 5],"#FFD380",
+        ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
+        ["==", ["get", "CMP_ID"], 7],"#D7C19E",
+        ["==", ["get", "CMP_ID"], 8],"#82D4F2",
+        ["==", ["get", "CMP_ID"], 9],"#DABEDB",
+        ["==", ["get", "CMP_ID"], 10],"#B57DB6",
+        ["==", ["get", "CMP_ID"], 11],"#FAF078",
+        ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
+        ["==", ["get", "CMP_ID"], 13],"#D7D79E",
+        ["==", ["get", "CMP_ID"], 14],"#80AEDD",
+        ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
+        ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
+        ["==", ["get", "CMP_ID"], 17],"#39BF7C",
+        "#cccccc"
+      ],
+    "fill-opacity": 0.8
+  }
+});
 
-    // When the user moves their mouse over the states-fill layer, we'll update the filter in
-    // the state-fills-hover layer to only show the matching state, thus making a hover effect.
-    map.on("mousemove", "TSP", function(e) {
-        map.setFilter("TSP-hover", ["==", "FACILITY", e.features[0].properties.FACILITY]);
-    });
 
-    // Reset the state-fills-hover layer's filter when the mouse leaves the layer.
-    map.on("mouseleave", "TSP", function() {
-        map.setFilter("TSP-hover", ["==", "FACILITY", ""]);
-    });
- // When a click event occurs on a feature in the places layer, open a popup at the
+    // When a click event occurs on a feature in the places layer, open a popup at the
     // location of the feature, with description HTML from its properties.
-    map.on('click', 'TSP', function (e) {
+    map.on('click', 'CMP_PA', function (e) {
     var features = map.queryRenderedFeatures(e.point, {
-        layers: ['TSP']
+        layers: ['CMP_PA']
       });
 
       if (!features.length) {
         return;
       }
 
-      var feature = features[0];
-      var content = '<div><strong>' + feature.properties.FACILITY + '</strong>' +
-                  '<p>' + feature.properties.FundCost + '</p></div>';
+    var feature = features[0];
+    var props = feature.properties;
+//      var info = '<h4 style="color:white;background-color:' + (props.BANCOLOR) + '"><div class="label"><img class="shield" src="' + (props.SHIELD) + ' ">' + (props.NAME) + '</div></h4>' + "<div class='labelfield'><b>Subcorridor ID/Name: </b>" + (props.CMP_ID) + (props.SUB_ID) + " - " + (props.SUBNAME) + "<br>" + "<div class='labelfield'><b>Priority Subcorridor: </b>" + (props.PRIORITY) + "</div>";
 
+  //    var content = '<img style="margin:0px 0px 5px 0px" src="https://www.dvrpc.org/asp/TIPsearch/2015/PA/img/document.png"/>&nbsp; - <a class="one" href="' + (props.REPORT) + '" target="_blank"> ' + "View Subcorridor Information" + "</a><br>" +
+  //      '<a href="#" id="zoomToBtn" class="btn btn-primary" onclick="map.setView(new L.LatLng( ' + (props.LAT) + ' , ' + (props.LONG) + ' ),12); return false;">Zoom To Subcorridor</a>' + "</div>" + "<br></br>";
+   
+     var content =
+        '<h4 style="color:white;background-color:' + (props.BANCOLOR) + '"><div class="label"><img class="shield" src="' + (props.SHIELD) + ' ">' + (props.NAME) + '</div></h4>' + "<div class='labelfield'><b>Subcorridor ID/Name: </b>" + (props.CMP_ID) + (props.SUB_ID) + " - " + (props.SUBNAME) + "<br>" + "<div class='labelfield'><b>Priority Subcorridor: </b>" + (props.PRIORITY) + "</div>";
+        
+        
+     // info.innerHTML = info;  
       info.innerHTML = content;
-
-      map.flyTo({
-        center: feature.geometry.coordinates,
-        pitch: 50,
-        zoom: 14
-      }); 
-
     });
 
-    // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'TSP', function () {
-        map.getCanvas().style.cursor = 'pointer';
-    });
-
-    // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'TSP', function () {
-        map.getCanvas().style.cursor = '';
-    });
-
- // change info window on hover
     map.on('mousemove', function (e) {
         var states = map.queryRenderedFeatures(e.point, {
             layers: ['RSE']
@@ -192,13 +167,6 @@ map.on('load', function () {
             document.getElementById('pd').innerHTML = '<p>Hover over a project!</p>';
         }
     });
-
-    });
-
-
-// walk about layer
-map.on('load', function () {
-
 
    map.addLayer({
         id: "RSE",
@@ -212,7 +180,9 @@ map.on('load', function () {
             "line-join": "round",
             "line-cap": "round"
         },
-
+         layout: {
+   visibility: "none"
+  },
         paint: {
            "line-color":
                 [
@@ -223,57 +193,8 @@ map.on('load', function () {
                   "#223860",
                   "#cccccc"
                 ],
-
-   //   "line-color": "red",
             "line-width": 2
         }
-    });
-map.addLayer({
- id: "CMP Corridors",
-  type: "fill",
-  // source: "CMP",
-  source: {
-            "type": "geojson",
-            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=" 
-            //"data": RSE
-        },
-  layout: {
-   // visibility: "true"
-  },
-  paint: {
-    "fill-color": ["get", "WEB_COLOR"],
-    "fill-opacity": 0.8
-  }
-});
-  
-    map.addLayer({
-        "id": "RSE-hover",
-        "type": "line",
-        "source": {
-            "type": "geojson",
-            "data": RSE
-        },
-        "layout": {
-            "line-join": "round",
-            "line-cap": "round"
-        },
-        "paint": {
-            "line-color": "red",
-            "line-width": 8
-        },
-        "filter": ["==", "FACILITY", ""]
-    });
-
-    // When the user moves their mouse over the states-fill layer, we'll update the filter in
-    // the state-fills-hover layer to only show the matching state, thus making a hover effect.
-    map.on("mousemove", "RSE", function(e) {
-    console.log(e.features[0].properties);
-        map.setFilter("RSE-hover", ["==", "FACILITY", e.features[0].properties.TTI]);
-    });
-
-    // Reset the state-fills-hover layer's filter when the mouse leaves the layer.
-    map.on("mouseleave", "RSE", function() {
-        map.setFilter("RSE-hover", ["==", "FACILITY", ""]);
     });
 
     // When a click event occurs on a feature in the places layer, open a popup at the
@@ -289,23 +210,16 @@ map.addLayer({
 
       var feature = features[0];
         
-      var content = '<h4 style="color:white;background-color:'+ feature.properties.color +'"><img style="margin:0px 0px 0px 0px" src="'+feature.properties.TYPE_IMG+'"/>' + feature.properties.FACILITY+'</h4>'
-        +'<B>Project Scope:</B> '+ feature.properties.PROJSCOPE  
-        +'<br><B>Location:</B> '+ feature.properties.LOC
-        +'<br><B>State:</B> '+ feature.properties.State
+      var content =
+        +'<B>Project Scope:</B> '+ feature.properties.PTI 
+        +'<br><B>Location:</B> '+ feature.properties.TTI
+        +'<br><B>State:</B> '+ feature.properties.RoadName
         +'<br><B>Timing:</B> '+ feature.properties.Timing
         +'<br><table class="infotable"><thead><tr><th>Total Funded Cost<br><i>(millions in Y-O-E $)</i></th><th>Unfunded Cost<br><i>(millions in 2013 $)</i></th></tr></thead>'
-        +'<tbody><tr><td>'+ numeral(feature.properties.FundCost).format('($0,0.0)') +'</td><td> '+ numeral(feature.properties.UnfundCost).format('($0,0.0)') +'</td></tr></tbody>'
+        +'<tbody><tr><td>'+ feature.properties.FundCost +'</td><td> '+ feature.properties.UnfundCost +'</td></tr></tbody>'
         +'</table><br>'
         ;
       info.innerHTML = content;
-
-      map.flyTo({
-        center: [feature.properties.LONG,feature.properties.LAT],
-        pitch: 50,
-        zoom: 11
-      }); 
-
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
