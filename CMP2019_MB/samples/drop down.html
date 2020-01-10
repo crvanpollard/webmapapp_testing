@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mapbox</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1" />
+    <!-- Load Esri Leaflet from CDN -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+  </head>
+
+  <body style="margin: 0px; padding: 0px;">
+    <select id="pubTypeFilter" name="pubTypeFilter" style="z-index: 999; position: absolute; top: 0;">
+      <option value="">Select Pub Type</option>
+    </select>
+    <div id="map" style="position: absolute; top: 0px; bottom: 0px; width: 100%;"></div>
+    <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
+  
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [ -75.170669,39.950143], 
+        zoom: 9
+    });
+
+ const geojson = {id:"CMP_PA",type:'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&geometryPrecision=4&outSR=4326&f=pgeojson'
+};
+
+
+ /*    map.on("load", function() {
+        map.addLayer({
+          id: "places",
+          type: "symbol",
+          source: {
+            type: "geojson",
+            data: geojson
+          },
+          layout: {
+            "icon-image": "bar-15",
+            "icon-size": 1.25,
+            "icon-allow-overlap": true,
+          }
+        });
+  */
+  
+// walk about layer
+map.on('load', function () {
+
+  map.addLayer({
+  id: "CMP_PA",
+  type: "fill",
+  source: {
+            "type": "geojson",
+            "data": geojson
+          },
+  layout: {
+   visibility: "visible"
+  },
+  paint: {
+    "fill-color": [
+        "case",
+        ["==", ["get", "CMP_ID"], 1],"#92D3C8",
+        ["==", ["get", "CMP_ID"], 2],"#F37D80",
+        ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
+        ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
+        ["==", ["get", "CMP_ID"], 5],"#FFD380",
+        ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
+        ["==", ["get", "CMP_ID"], 7],"#D7C19E",
+        ["==", ["get", "CMP_ID"], 8],"#82D4F2",
+        ["==", ["get", "CMP_ID"], 9],"#DABEDB",
+        ["==", ["get", "CMP_ID"], 10],"#B57DB6",
+        ["==", ["get", "CMP_ID"], 11],"#FAF078",
+        ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
+        ["==", ["get", "CMP_ID"], 13],"#D7D79E",
+        ["==", ["get", "CMP_ID"], 14],"#80AEDD",
+        ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
+        ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
+        ["==", ["get", "CMP_ID"], 17],"#39BF7C",
+        "#cccccc"
+      ],
+    "fill-opacity": 0.8
+  }
+
+});      
+
+        const pubTypes = geojson.features.map(feature => feature.properties.CMP_ID);
+        const uniquePubTypes = Array.from(new Set(pubTypes));
+        const filterElem = document.getElementById('pubTypeFilter');
+        uniquePubTypes.forEach(pubType => {
+          const opt = document.createElement('option');
+          opt.value = pubType;
+          opt.innerText = pubType; 
+          filterElem.appendChild(opt);
+        });
+        
+        filterElem.onchange = () => {
+          const pubType = filterElem.value;
+          const newGeoJSON = {...geojson };
+          if (pubType) {
+            newGeoJSON.features = geojson.features.filter(feature => feature.properties.PubType === pubType);
+          } else {
+            newGeoJSON.features = [...geojson.features];
+          }
+          map.getSource('CMP_PA').setData(newGeoJSON);
+        };
+
+        const popup = new mapboxgl.Popup();
+        map.on("click", e => {
+          const features = map.queryRenderedFeatures(e.point, { layers: ['CMP_PA'] });
+          if (features && features.length > 0) {
+            popup
+              .setLngLat(e.lngLat)
+              .setHTML(
+                "<h3>" +
+                  features[0].properties.name +
+                  "</h3>" +
+                  "<h4>Opening Times</h4>" +
+                  "<p>" +
+                  features[0].properties.times +
+                  "</p>"
+              )
+              .addTo(map);
+          } else {
+            popup.remove();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

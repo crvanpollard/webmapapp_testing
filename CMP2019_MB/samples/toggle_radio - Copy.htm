@@ -45,6 +45,57 @@
   /*  padding: 10px 20px; */
     box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
     }
+    #features {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 600px;
+    border-radius: 3px;
+    overflow: auto;
+    background: rgba(255, 255, 255, 0.8);
+}
+#menu {
+    background: #fff;
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    left: 10px;
+    border-radius: 3px;
+    width: 120px;
+    border: 1px solid rgba(0,0,0,0.4);
+    font-family: 'Open Sans', sans-serif;
+}
+
+#menu a {
+    font-size: 13px;
+    color: #404040;
+    display: block;
+    margin: 0;
+    padding: 0;
+    padding: 10px;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+#menu a:last-child {
+    border: none;
+}
+
+#menu a:hover {
+    background-color: #f8f8f8;
+    color: #404040;
+}
+
+#menu a.active {
+    background-color: #3887be;
+    color: #ffffff;
+}
+
+#menu a.active:hover {
+    background: #3074a4;
+}
 </style>
 <div id="map"></div>
 
@@ -56,7 +107,7 @@
           <div class="panel-collapse collapse in" id="overlay-layers">
             <div class="panel-body" style="padding: 0px 15px;">
           
-        <div class='row' id='filters'>
+           <div class='row' id='filters'>
         <input id='all' type='radio' name='toggle' value='all' checked='checked'>
         <label for='all'>None</label>
         <input id='TTI' type='radio' name='toggle' value='TTI'>
@@ -82,8 +133,10 @@ document.getElementById('filters').addEventListener('change', function(e) {
       var day = e.target.value;
       // update the map filter
       if (day === 'TTI') {
+       // alert(day);
        map.setLayoutProperty(day, 'visibility', 'visible');
       } else if (day === 'PTI') {
+      //  alert(day);
        map.setLayoutProperty('TTI','visibility', 'none');
        map.setLayoutProperty(day, 'visibility', 'visible');
       } else if (day === 'all') {
@@ -191,6 +244,62 @@ document.getElementById('filters').addEventListener('change', function(e) {
                 ],
         }
     });
+
+/* map.on('click','TTI', function (e) {
+     var bbox = [[e.point.x - 5, e.point.y - 5],[e.point.x + 5, e.point.y + 5]];
+     var features = map.queryRenderedFeatures(bbox, {
+        layers: ['TTI']
+      });
+
+      if (!features.length) {
+
+        return;
+      }
+        // Grab the 'ul' element with ID 'features' from the DOM            
+        var featureList = document.getElementById('info');
+
+        // Empty the list on every click
+        featureList.innerHTML = '';
+
+        // Iterate the features array
+        for (var i = 0; i < features.length; i++) {
+         //   console.log(features[i].properties.TTI);
+            // Create a listitem for each feature
+            var featureItem = document.createElement('li');
+
+            // Set the feature's listitem's content to the layer's ID
+            featureItem.textContent = features[i].layer.id;
+
+            // Append the featureitem to the featurelist
+            featureList.appendChild(featureItem);
+
+            // Create a new list for the item's properties
+            var propertyList = document.createElement('ul');
+
+            // Append the list to the feature's listitem
+            featureItem.appendChild(propertyList);
+
+            // Create convenience var for the properties object
+            var properties = features[i].properties;
+         
+            // Iterate the properties object
+            for (var property in properties) {
+
+                // Create new listitem for every property
+                var propertyItem = document.createElement('li');
+
+                // Set property's listitem's textcontent to key/value
+                propertyItem.textContent = property + ': ' + properties[property];
+
+                // Append property's listitem to the feature's propertylist.
+                propertyList.appendChild(propertyItem);
+
+            }
+            
+        }
+
+    });
+*/
  
 
 map.on('click', 'TTI', function (e) {
@@ -219,6 +328,36 @@ map.on('click', 'TTI', function (e) {
       info.innerHTML = content;
     });
 
+/*
+ map.on('click', 'TTI', function(e) {
+    
+    var bbox = [[e.point.x - 5, e.point.y - 5],[e.point.x + 5, e.point.y + 5]];
+    var features = map.queryRenderedFeatures(bbox, {layers: ['TTI']});
+ 
+// Limit the number of properties we're displaying for
+// legibility and performance
+//var displayProperties = ['properties'];
+ 
+var displayFeatures = features.map(function(feat) {
+var displayFeat = {};
+features.forEach(function(prop) {
+//displayFeat[prop] = feat.properties.TTI;;
+var content ='<B>Project Scope:</B> '+ feat.properties.PTI 
+        +'<br><B>Location:</B> '+ feat.properties.TTI
+        ;
+displayFeat[prop] = content;
+});
+return displayFeat;
+});
+
+info.innerHTML = JSON.stringify( displayFeatures,null,2);
+
+// document.getElementById('info').innerHTML = JSON.stringify( displayFeatures,null,2);
+// filteredFeatures.forEach((filter) => {
+//      filter.properties.ratings = JSON.parse(filter.properties.ratings);
+ //   });
+});
+*/
     });
 </script>
 
