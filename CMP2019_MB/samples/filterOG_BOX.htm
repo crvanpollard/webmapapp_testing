@@ -63,7 +63,7 @@
         </div>
       </div>
     </div>
-
+</div>
 <script>
     var CMP = 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&geometryPrecision=4&outSR=4326&f=pgeojson';
 
@@ -99,10 +99,11 @@
       // Add a GeoJSON source containing CMP coordinates and information.
         map.addSource('CMP', {
         'type': 'geojson',
-        'data': CMP
+        'data': 'CMP'
         });
 
-        CMP.features.forEach(function(feature) {
+
+       this.features.forEach(function(feature) {
             var CMP_ID = feature.properties['CMP_ID'];
             var layerID = 'PA'+ CMP_ID;
 
@@ -137,7 +138,6 @@
                       ],
                     'fill-opacity': 0.8
                     }
-                 //   'filter': ['==', 'CMP_ID', CMP_ID]
                 });
             layerIDs.push(layerID);
                 // When the checkbox changes, update the visibility of the layer.
@@ -149,9 +149,6 @@
                     );
                 });
         */
-
-
-
             }
         });
     });

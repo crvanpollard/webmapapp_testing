@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+        <link rel="stylesheet" href="//api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css" />
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+<style>
+    body {
+    margin:0;
+    padding:0;
+}
+
+#map {
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:100%;
+}
+
+#features {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 600px;
+    border-radius: 3px;
+    overflow: auto;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+#menu {
+    background: #fff;
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    left: 10px;
+    border-radius: 3px;
+    width: 120px;
+    border: 1px solid rgba(0,0,0,0.4);
+    font-family: 'Open Sans', sans-serif;
+}
+
+#menu a {
+    font-size: 13px;
+    color: #404040;
+    display: block;
+    margin: 0;
+    padding: 0;
+    padding: 10px;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+#menu a:last-child {
+    border: none;
+}
+
+#menu a:hover {
+    background-color: #f8f8f8;
+    color: #404040;
+}
+
+#menu a.active {
+    background-color: #3887be;
+    color: #ffffff;
+}
+
+#menu a.active:hover {
+    background: #3074a4;
+}
+</style>
+        <div id='map'></div>
+        <ul id='features'></ul>
+        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoibWJiZGV2IiwiYSI6ImNpam9mMHl6ODAwNXp2MWx4dzQybGl3aW4ifQ.CgtmPVAoOj5wcGnc6q2akg';
+
+mapboxgl.util.getJSON('https://api.mapbox.com/styles/v1/mbbdev/cikiclfrl003oaxkim8rml3el?access_token=' + mapboxgl.accessToken, function (err, style) {
+
+    if (err) throw err;
+
+    style.layers.forEach(function (layer) {
+		layer.visibility = 1;
+        layer.interactive = true;
+    });
+
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: style,
+        center: [-2.89, 53.45],
+        zoom: 10,
+		maxBounds: [
+    		[-3.348083, 53.225768],
+    		[-2.408066, 53.766572]
+    	]
+    });	
+	
+	map.on('click', function (e) {
+    map.featuresAt(e.point, {
+        radius: 5,
+    }, function (err, features) {
+        if (err) throw err;
+
+        // Grab the 'ul' element with ID 'features' from the DOM            
+        var featureList = document.getElementById('features');
+
+        // Empty the list on every click
+        featureList.innerHTML = '';
+
+        // Iterate the features array
+        for (var i = 0; i < features.length; i++) {
+
+            // Create a listitem for each feature
+            var featureItem = document.createElement('li');
+
+            // Set the feature's listitem's content to the layer's ID
+            featureItem.textContent = features[i].layer.id;
+
+            // Append the featureitem to the featurelist
+            featureList.appendChild(featureItem);
+
+            // Create a new list for the item's properties
+            var propertyList = document.createElement('ul');
+
+            // Append the list to the feature's listitem
+            featureItem.appendChild(propertyList);
+
+            // Create convenience var for the properties object
+            var properties = features[i].properties;
+
+            // Iterate the properties object
+            for (var property in properties) {
+
+                // Create new listitem for every property
+                var propertyItem = document.createElement('li');
+
+                // Set property's listitem's textcontent to key/value
+                propertyItem.textContent = property + ': ' + properties[property];
+
+                // Append property's listitem to the feature's propertylist.
+                propertyList.appendChild(propertyItem);
+
+            }
+
+        }
+
+    });
+});
+
+});
+</script>
+    </body>
+</html>
