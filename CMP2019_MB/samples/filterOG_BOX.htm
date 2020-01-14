@@ -29,19 +29,67 @@
     z-index: 1001;
     border: 1px solid #000;
     border-radius: 5px;
-  /*  padding: 10px 20px; */
+    padding: 10px 5px;
     box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
     }
+    .filter-group {
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+font-weight: 600;
+position: absolute;
+top: 10px;
+left: 10px;
+z-index: 1;
+border-radius: 3px;
+width: 120px;
+color: #fff;
+}
+ 
+.filter-group input[type='checkbox']:first-child + label {
+border-radius: 3px 3px 0 0;
+}
+ 
+.filter-group label:last-child {
+border-radius: 0 0 3px 3px;
+border: none;
+}
+ 
+.filter-group input[type='checkbox'] {
+display: none;
+}
+ 
+.filter-group input[type='checkbox'] + label {
+background-color: #3386c0;
+display: block;
+cursor: pointer;
+padding: 10px;
+border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+ 
+.filter-group input[type='checkbox'] + label {
+background-color: #3386c0;
+text-transform: capitalize;
+}
+ 
+.filter-group input[type='checkbox'] + label:hover,
+.filter-group input[type='checkbox']:checked + label {
+background-color: #4ea0da;
+}
+ 
+.filter-group input[type='checkbox']:checked + label:before {
+content: '✔';
+margin-right: 5px;
+}
 </style>
 <div id="map"></div>
+<nav id="filter-group" class="filter-group"></nav>
  <div id="legendBox">
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-collapse collapse in" id="overlay-layers">
             <div class="panel-body" style="padding: 0px 15px;">
-             <div class="checked_corridor">
-                <input type="checkbox"  class="checked_all" style="margin-top:0px" checked>&nbsp;Select/Clear All               
-                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA1" checked><img src='img/PA1.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.134446' , '-75.194426' ),11); return false;">1 - I-276 (PA Turnpike)</a></span> </div>
+             <div class="checked_corridor" id="CMP_Layers">
+                <input type="checkbox"  name="overlayLayers" id="all" checked>&nbsp;Select/Clear All               
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA1" value="PA1"><img src='img/PA1.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.134446' , '-75.194426' ),11); return false;">1 - I-276 (PA Turnpike)</a></span> </div>
                 <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA2" checked><img src='img/PA2.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.069574' , '-75.305552' ),10); return false;">2 - I-476</a></span></div>
                 <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA3" checked><img src='img/PA3.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.031235' , '-75.245402' ),11); return false;">3 - I-76 &amp; I-676</a></span></div>
                 <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA4" checked><img src='img/PA4.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.013267' , '-75.062184' ),11); return false;">4 - I-95</a></span></div>
@@ -63,10 +111,14 @@
         </div>
       </div>
     </div>
-</div>
+
 <script>
     var CMP = 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&geometryPrecision=4&outSR=4326&f=pgeojson';
-
+    var allIDs = []
+    var filterGroup = document.getElementById('filter-group');
+  //  var layer ;
+ //  var PA1 ;
+    
     mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
   
     var map = new mapboxgl.Map({
@@ -76,81 +128,149 @@
         zoom: 9
     });
 
-    // Toggle individual CMP corridor layers
-    $('input:checkbox[name="overlayLayers"]').on('change', function() {
-        var layers = [];
-        $('input:checkbox[name="overlayLayers"]').each(function() {
-            // Remove all overlay layers
-           // hideLayer($(this).attr('id'));
-
-          //  $('#infosidebar').html('');
-
-            if ($('#' + $(this).attr('id')).is(':checked')) {
-               map.setLayoutProperty(
-                            layerID,
-                            'visibility',
-                            e.target.checked ? 'visible' : 'none'
-                        );
-            }
-        });
-    });
-
     map.on('load', function() {
       // Add a GeoJSON source containing CMP coordinates and information.
         map.addSource('CMP', {
         'type': 'geojson',
-        'data': 'CMP'
+        'data': CMP
         });
 
-       CMP_ID.features.forEach(function(feature) {
-            var CMP_ID = feature.properties['CMP_ID'];
-            var layerID = 'PA'+ CMP_ID;
+        $.ajax(CMP)
+          .done(function(data) {
+            data = JSON.parse(data)
+            console.log(data.features)
 
-            // Add a layer for this symbol type if it hasn't been added already.
-            if (!map.getLayer(layerID)) {
-                map.addLayer({
-                    'id': layerID,
-                    'type': 'fill',
-                    'source': 'CMP',
-                    'layout': {visibility:'visible'},
-                    'paint': {
-                    'fill-color': [
-                        "case",
-                        ["==", ["get", "CMP_ID"], 1],"#92D3C8",
-                        ["==", ["get", "CMP_ID"], 2],"#F37D80",
-                        ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
-                        ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
-                        ["==", ["get", "CMP_ID"], 5],"#FFD380",
-                        ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
-                        ["==", ["get", "CMP_ID"], 7],"#D7C19E",
-                        ["==", ["get", "CMP_ID"], 8],"#82D4F2",
-                        ["==", ["get", "CMP_ID"], 9],"#DABEDB",
-                        ["==", ["get", "CMP_ID"], 10],"#B57DB6",
-                        ["==", ["get", "CMP_ID"], 11],"#FAF078",
-                        ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
-                        ["==", ["get", "CMP_ID"], 13],"#D7D79E",
-                        ["==", ["get", "CMP_ID"], 14],"#80AEDD",
-                        ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
-                        ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
-                        ["==", ["get", "CMP_ID"], 17],"#39BF7C",
-                        "#cccccc"
-                      ],
-                    'fill-opacity': 0.8
-                    }
-                });
-            layerIDs.push(layerID);
-                // When the checkbox changes, update the visibility of the layer.
-         /*       input.addEventListener('change', function(e) {
-                    map.setLayoutProperty(
-                        layerID,
-                        'visibility',
-                        e.target.checked ? 'visible' : 'none'
-                    );
-                });
-        */
-            }
-        });
+            data.features.forEach(function(feature) {
+              var CMP_ID = feature.properties['CMP_ID'];
+              var layerID = 'PA'+ CMP_ID;
+              console.log(layerID)
+           //   allIDs.push(layerID)
+
+              // Add a layer for this symbol type if it hasn't been added already.
+              // there's something wonky with this...
+              if (!map.getLayer(layerID)) {
+                  map.addLayer({
+                      'id': layerID,
+                      'type': 'fill',
+                      'source': 'CMP',
+                   //   'layout': {visibility:'visible'},
+                      'paint': {
+                      'fill-color': [
+                          "case",
+                          ["==", ["get", "CMP_ID"], 1],"#92D3C8",
+                          ["==", ["get", "CMP_ID"], 2],"#F37D80",
+                          ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
+                          ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
+                          ["==", ["get", "CMP_ID"], 5],"#FFD380",
+                          ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
+                          ["==", ["get", "CMP_ID"], 7],"#D7C19E",
+                          ["==", ["get", "CMP_ID"], 8],"#82D4F2",
+                          ["==", ["get", "CMP_ID"], 9],"#DABEDB",
+                          ["==", ["get", "CMP_ID"], 10],"#B57DB6",
+                          ["==", ["get", "CMP_ID"], 11],"#FAF078",
+                          ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
+                          ["==", ["get", "CMP_ID"], 13],"#D7D79E",
+                          ["==", ["get", "CMP_ID"], 14],"#80AEDD",
+                          ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
+                          ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
+                          ["==", ["get", "CMP_ID"], 17],"#39BF7C",
+                          "#cccccc"
+                        ],
+                      'fill-opacity': 0.8
+                      },
+                     'filter': ['==', 'CMP_ID', CMP_ID]
+                  });
+              }
+
+// Add checkbox and label elements for the layer.
+/*var input = document.getElement('input');
+input.type = 'checkbox';
+input.id = layerID;
+input.checked = true;
+filterGroup.appendChild(input);
+ 
+var label = document.createElement('label');
+label.setAttribute('for', layerID);
+label.textContent = CMP_ID;
+filterGroup.appendChild(label);
+ */
+var input = document.getElementById('CMP_Layers'); 
+// When the checkbox changes, update the visibility of the layer.
+input.addEventListener('change', function(e) {
+  alert(layerID);
+map.setLayoutProperty( 'PA17','visibility',e.target.checked ? 'visible' : 'none');
+});
+
+
+
+
+            });
+          })
+          .fail(function(xhr, status) {
+            console.log('failed because: ', status)
+          })
     });
+
+
+/*function toggleLayer(e){
+    var layer = e.value;
+    alert(layer);
+  //  console.log(e);
+    map.setLayoutProperty('PA1', 'visibility', 'none');
+
+  //  this_layer.setMap(map);
+
+//    shownLayer = this_layer;
+
+    if ( layer === 'PA1' ) {
+  //      info.innerHTML = '';
+        map.setLayoutProperty('PA1', 'visibility', 'none');
+
+       map.setLayoutProperty(layer,'visibility', 'visible');
+       return layer;
+    }
+
+};
+*/
+/*
+              // When the checkbox changes, update the visibility of the layer.
+              var input = document.getElementById('CMP_Layers');
+input.addEventListener('change', function(e) {
+  alert(e.value);
+map.setLayoutProperty('PA1','visibility', e.target.checked ? 'visible' : 'none');
+});
+*/
+
+    // Toggle individual CMP corridor layers
+/*    $('input:checkbox[name="overlayLayers"]').on('change', function(e) {
+
+      // get a handle on the selected checkbox & its state
+      var layerID = e.target.id
+      var visibility = e.target.checked ? 'visible': 'none'
+      console.log(e);
+
+      // handle select/clear all case
+      if (layerID === 'PA1') {
+        allIDs.forEach(id => {
+          map.setLayoutProperty(
+            id,
+            'visibility',
+            visibility
+        );
+        })
+      }
+      // handle individual layers
+      else {
+        map.setLayoutProperty(
+            layerID,
+            'visibility',
+            visibility
+        );
+      }
+    });
+*/
+
+
 </script>
 
 </body>
