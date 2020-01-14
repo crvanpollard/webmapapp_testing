@@ -66,17 +66,16 @@
                             <label><input id='TTI_PM' type='radio' name="optradio" value='TTI' onClick='toggleLayer(TTI_PM);'>High Travel Time Index (TTI)</label>
                           </div>
                           <div class="radio">
-                            <label><input id='VC_PM' type='radio' name="optradio" value='PTI' onClick='toggleLayer(VC_PM);'>Anticipated Growth in V/C</label>
+                            <label><input id='VC_PM' type='radio' name="optradio" value='LRP_VC' onClick='toggleLayer(VC_PM);'>Anticipated Growth in V/C</label>
                           </div>
                          
                           <h5><B>Increase Accessibility &amp; Mobility </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw2()'></i></h5>
                           <div class="radio">
-                            <label><input name="optradio" type="radio" id="TransScore_PM" >Transit Score and Rails Stations</label>
+                            <label><input name="optradio" type="radio" id="TransScore_PM" value='TSCORE' onClick='toggleLayer(TransScore_PM);'>Transit Score and Rails Stations</label>
                           </div>
                           <div class="radio">
-                            <label><input id='PTI' type="radio" name="optradio" value='PTI'  >High Planning Time Index (PTI)</label>
+                            <label><input id='PTI_PM' type="radio" name="optradio" value='PTI'  onClick='toggleLayer(PTI_PM);'>High Planning Time Index (PTI)</label>
                           </div>
-                         
                           <h5><B>Rebuild &amp; Maintain Transportation Infrastructure </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw3()'></i></h5>
                           <div class="radio">
                             <label><input name="optradio" type="radio" id="NHSPoint_PM" >Core Transportation Network</label>
@@ -136,32 +135,15 @@
 </div> 
 
 <script>
-var TTI, PTI, all;
+var TTI, PTI, TSCORE, LRP_VC, all;
 var info = document.getElementById('info');
 var layer;
-/* document.getElementById('overlay-layers').addEventListener('change', function(e) {
-      var day = e.target.value;
-      // update the map filter
-      if (day === 'TTI') {
-       // alert(day);
-       map.setLayoutProperty('PTI','visibility', 'none');
-       map.setLayoutProperty(day, 'visibility', 'visible');
-      } else if (day === 'PTI') {
-      //  alert(day);
-       map.setLayoutProperty('TTI','visibility', 'none');
-       map.setLayoutProperty(day, 'visibility', 'visible');
-      } else if (day === 'all') {
-        map.setLayoutProperty('TTI','visibility', 'none');
-        map.setLayoutProperty('PTI','visibility', 'none');
-      } else {
-        map.setLayoutProperty('TTI', 'visibility', 'none');
-      };
-    });
-*/
 function toggleLayer(e){
   //  console.log(e);
     var layer = e.value;
     map.setLayoutProperty('TTI', 'visibility', 'none');
+    map.setLayoutProperty('LRP_VC', 'visibility', 'none');
+    map.setLayoutProperty('TSCORE', 'visibility', 'none');
     map.setLayoutProperty('PTI', 'visibility', 'none');
   //  map.setLayoutProperty(layer,'visibility', 'none');
   //  map.setLayoutProperty(layer,'visibility', 'visible');
@@ -173,6 +155,8 @@ function toggleLayer(e){
     if ( layer === 'none' ) {
         info.innerHTML = '';
         map.setLayoutProperty('TTI', 'visibility', 'none');
+        map.setLayoutProperty('LRP_VC', 'visibility', 'none');
+        map.setLayoutProperty('TSCORE', 'visibility', 'none');
         map.setLayoutProperty('PTI', 'visibility', 'none');
     } else {
        map.setLayoutProperty(layer,'visibility', 'visible');
@@ -237,6 +221,103 @@ function toggleLayer(e){
         }
     });
 
+    map.addLayer({
+        id: "LRP_VC",
+        type: "line",
+        source: {
+            "type": "geojson",
+            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=LRP_VC+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+        },
+        layout: {
+            "visibility":"none",
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        paint: {
+           "line-color":
+                [
+                "case",
+                  ["==", ["get", "LRP_VC"], .5],
+                  "#f5b041",
+                  ["==", ["get", "LRP_VC"], 1],
+                  "#cb4335",
+                  "#cccccc"
+                ],
+            "line-width":
+                [
+                "case",
+                  ["==", ["get", "LRP_VC"], .5],
+                  6,
+                  ["==", ["get", "LRP_VC"], 1],
+                  2,
+                  0
+                ],
+                   "line-opacity":
+                [
+                "case",
+                  ["==", ["get", "LRP_VC"], .5],
+                  .4,
+                  ["==", ["get", "LRP_VC"], 1],
+                  .8,
+                  0
+                ],
+        }
+    });
+
+
+
+   map.addLayer({
+        id: "TSCORE",
+        type: "line",
+        source: {
+            "type": "geojson",
+            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TransScore>+0+or+RailPoint+>+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+        },
+        layout: {
+            "visibility":"none",
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        paint: {
+           "line-color":
+                [
+                "case",
+                  [
+                  "any",
+                  ["==", ["get", "TransScore"], .5],
+                  ["==", ["get", "RailPoint"], .5]
+               //   "==", ["get", "RailPoint"], .5
+                  ],
+                  "#f5b041",
+                  [
+                   "any",
+                  ["==", ["get", "TransScore"], 1],
+                  ["==", ["get", "RailPoint"], 1]
+                  ],
+                  "#cb4335",
+                  "#cccccc"
+                ],
+            "line-width":
+                [
+                "case",
+                  ["any",["==", ["get", "TransScore"], .5],["==", ["get", "RailPoint"], .5]],
+                  6,
+                  ["any",["==", ["get", "TransScore"], 1],["==", ["get", "RailPoint"], 1]],
+                  2,
+                  0
+                ],
+                   "line-opacity":
+                [
+                "case",
+                ["any",["==", ["get", "TransScore"], .5],["==", ["get", "RailPoint"], .5]],
+                  .4,
+                ["any",["==", ["get", "TransScore"], 1],["==", ["get", "RailPoint"], 1]],
+                  .8,
+                  0
+                ],
+        }
+    });
+
  map.addLayer({
         id: "PTI",
         type: "line",
@@ -281,11 +362,9 @@ function toggleLayer(e){
     });
 
 
-
-
 map.on('click', function (e) {
     var bbox = [[e.point.x - 5, e.point.y - 5],[e.point.x + 5, e.point.y + 5]];
-    var features = map.queryRenderedFeatures(bbox, {layers: ['TTI','PTI']});
+    var features = map.queryRenderedFeatures(bbox, {layers: ['TTI','LRP_VC','TSCORE','PTI']});
 
       if (!features.length) {
         //  console.log(e.lngLat);
