@@ -46,71 +46,163 @@ placeholder="Filter by name"
  
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
-var CMP_PA = 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token='; 
-var layerIDs = []; // Will contain a list used to filter against.
-var filterInput = document.getElementById('filter-input');
-var map = new mapboxgl.Map({
-container: 'map',
-style: 'mapbox://styles/mapbox/light-v10',
-center: [ -75.170669,39.950143], 
-zoom: 11.15
-});
- 
-map.on('load', function() {
- 
-CMP_PA.features.forEach(function(feature) {
-var symbol = feature.properties['CMP_ID'];
-var layerID = symbol;
- 
-map.addLayer({
-  id: "CMP_PA",
-  type: "fill",
-  //source: "CMP",
-  source: {
-            "type": "geojson",
-            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=" 
-        },
-  layout: {
-   visibility: "visible"
-  },
-  paint: {
-    "fill-color": [
-        "case",
-        ["==", ["get", "CMP_ID"], 1],
-        "#f26522",
-        ["==", ["get", "CMP_ID"], 2],
-        "#223860",
-        ["==", ["get", "CMP_ID"], 3],
-        "#0b6d32",
-        ["==", ["get", "CMP_ID"], 4],
-        "#729faa",
-        ["==", ["get", "CMP_ID"], 5],
-        "#ed1c24",
-        ["==", ["get", "CMP_ID"], 6],
-        "#9d1d20",
-        "#cccccc"
-      ],
-    "fill-opacity": 0.8
-  });
- 
-layerIDs.push(layerID);
-})
+var places = 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token='; 
 
-});
- 
-filterInput.addEventListener('keyup', function(e) {
-// If the input value matches a layerID set
-// it's visibility to 'visible' or else hide it.
-var value = e.target.value.trim().toLowerCase();
-layerIDs.forEach(function(layerID) {
-map.setLayoutProperty(
-layerID,
-'visibility',
-layerID.indexOf(value) > -1 ? 'visible' : 'none'
-);
-});
-});
-});
+
+  /*  var places = {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'properties': {
+                    'icon': 'theatre'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-77.038659, 38.931567]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'icon': 'theatre'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-77.003168, 38.894651]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'icon': 'bar'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-77.090372, 38.881189]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'icon': 'bicycle'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-77.052477, 38.943951]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'icon': 'music'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-77.031706, 38.914581]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'icon': 'music'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-77.020945, 38.878241]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'icon': 'music'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-77.007481, 38.876516]
+                }
+            }
+        ]
+    };
+*/
+    var layerIDs = []; // Will contain a list used to filter against.
+    var filterInput = document.getElementById('filter-input');
+   var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [ -75.170669,39.950143], 
+        zoom: 9
+    });
+
+    map.on('load', function() {
+        console.log(places);
+        // Add a GeoJSON source containing place coordinates and information.
+        map.addSource('places', {
+            'type': 'geojson',
+            'data': places
+        });
+
+        places.features.forEach(function(feature) {
+          console.log(layerID);
+            var symbol = feature.properties['CMP_ID'];
+            var layerID = symbol;
+
+            // Add a layer for this symbol type if it hasn't been added already.
+            if (!map.getLayer(layerID)) {
+                map.addLayer({
+                    'id': layerID,
+                    'type': 'geojson',
+                    'source': 'places',
+                    'layout': {visibility:'visible'},
+                     'paint': {
+                    'fill-color': [
+                        "case",
+                        ["==", ["get", "CMP_ID"], 1],"#92D3C8",
+                        ["==", ["get", "CMP_ID"], 2],"#F37D80",
+                        ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
+                        ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
+                        ["==", ["get", "CMP_ID"], 5],"#FFD380",
+                        ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
+                        ["==", ["get", "CMP_ID"], 7],"#D7C19E",
+                        ["==", ["get", "CMP_ID"], 8],"#82D4F2",
+                        ["==", ["get", "CMP_ID"], 9],"#DABEDB",
+                        ["==", ["get", "CMP_ID"], 10],"#B57DB6",
+                        ["==", ["get", "CMP_ID"], 11],"#FAF078",
+                        ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
+                        ["==", ["get", "CMP_ID"], 13],"#D7D79E",
+                        ["==", ["get", "CMP_ID"], 14],"#80AEDD",
+                        ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
+                        ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
+                        ["==", ["get", "CMP_ID"], 17],"#39BF7C",
+                        "#cccccc"
+                      ],
+                    'fill-opacity': 0.8
+                    }
+                //    'filter': ['==', 'icon', symbol]
+                });
+
+                layerIDs.push(layerID);
+            }
+        });
+
+ /*       filterInput.addEventListener('keyup', function(e) {
+            // If the input value matches a layerID set
+            // it's visibility to 'visible' or else hide it.
+            var value = e.target.value.trim().toLowerCase();
+            layerIDs.forEach(function(layerID) {
+                map.setLayoutProperty(
+                    layerID,
+                    'visibility',
+                    layerID.indexOf(value) > -1 ? 'visible' : 'none'
+                );
+            });
+        }); */
+
+    });
+</script>
+
+</body>
+</html>
 </script>
  
 </body>
