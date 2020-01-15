@@ -32,64 +32,35 @@
     padding: 10px 5px;
     box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
     }
-    .filter-group {
+ #info {
+    position: absolute;
+    background:white;
+    height:300px;
+    width:310px;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+    .mapboxgl-popup {
+max-width: 400px;
 font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-font-weight: 600;
-position: absolute;
-top: 10px;
-left: 10px;
-z-index: 1;
-border-radius: 3px;
-width: 120px;
-color: #fff;
-}
- 
-.filter-group input[type='checkbox']:first-child + label {
-border-radius: 3px 3px 0 0;
-}
- 
-.filter-group label:last-child {
-border-radius: 0 0 3px 3px;
-border: none;
-}
- 
-.filter-group input[type='checkbox'] {
-display: none;
-}
- 
-.filter-group input[type='checkbox'] + label {
-background-color: #3386c0;
-display: block;
-cursor: pointer;
-padding: 10px;
-border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-}
- 
-.filter-group input[type='checkbox'] + label {
-background-color: #3386c0;
-text-transform: capitalize;
-}
- 
-.filter-group input[type='checkbox'] + label:hover,
-.filter-group input[type='checkbox']:checked + label {
-background-color: #4ea0da;
-}
- 
-.filter-group input[type='checkbox']:checked + label:before {
-content: '✔';
-margin-right: 5px;
 }
 </style>
 <div id="map"></div>
-<nav id="filter-group" class="filter-group"></nav>
+<div id="info"></div>
+
  <div id="legendBox">
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-collapse collapse in" id="overlay-layers">
             <div class="panel-body" style="padding: 0px 15px;">
              <div class="checked_corridor" id="CMP_Layers">
-                <input type="checkbox"  name="overlayLayers" id="all" checked>&nbsp;Select/Clear All               
-                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA1" value="PA1"><img src='img/PA1.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.134446' , '-75.194426' ),11); return false;">1 - I-276 (PA Turnpike)</a></span> </div>
+                <input type="checkbox"  name="overlayLayers" id="all" class="checked_all" checked>&nbsp;Select/Clear All               
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA1" checked><img src='img/PA1.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.flyTo({center:[-75.194426,40.134446], zoom: 10,speed:.20,bearing: -5,pitch: 15});return false;">1 - I-276 (PA Turnpike)</a></span> </div>
                 <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA2" checked><img src='img/PA2.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.069574' , '-75.305552' ),10); return false;">2 - I-476</a></span></div>
                 <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA3" checked><img src='img/PA3.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.031235' , '-75.245402' ),11); return false;">3 - I-76 &amp; I-676</a></span></div>
                 <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA4" checked><img src='img/PA4.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.013267' , '-75.062184' ),11); return false;">4 - I-95</a></span></div>
@@ -116,8 +87,7 @@ margin-right: 5px;
     var CMP = 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&geometryPrecision=4&outSR=4326&f=pgeojson';
     var allIDs = []
     var filterGroup = document.getElementById('filter-group');
-  //  var layer ;
- //  var PA1 ;
+    var layerID;
     
     mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
   
@@ -144,7 +114,7 @@ margin-right: 5px;
               var CMP_ID = feature.properties['CMP_ID'];
               var layerID = 'PA'+ CMP_ID;
               console.log(layerID)
-           //   allIDs.push(layerID)
+              allIDs.push(layerID)
 
               // Add a layer for this symbol type if it hasn't been added already.
               // there's something wonky with this...
@@ -194,16 +164,6 @@ label.setAttribute('for', layerID);
 label.textContent = CMP_ID;
 filterGroup.appendChild(label);
  */
-var input = document.getElementById('CMP_Layers'); 
-// When the checkbox changes, update the visibility of the layer.
-input.addEventListener('change', function(e) {
-  alert(layerID);
-map.setLayoutProperty( 'PA17','visibility',e.target.checked ? 'visible' : 'none');
-});
-
-
-
-
             });
           })
           .fail(function(xhr, status) {
@@ -211,38 +171,110 @@ map.setLayoutProperty( 'PA17','visibility',e.target.checked ? 'visible' : 'none'
           })
     });
 
+// Toggle individual CMP corridor layers
+$('input:checkbox[name="overlayLayers"]').on('change', function(e) {
+    var id = this.id;
 
-/*function toggleLayer(e){
-    var layer = e.value;
-    alert(layer);
-  //  console.log(e);
-    map.setLayoutProperty('PA1', 'visibility', 'none');
-
-  //  this_layer.setMap(map);
-
-//    shownLayer = this_layer;
-
-    if ( layer === 'PA1' ) {
-  //      info.innerHTML = '';
-        map.setLayoutProperty('PA1', 'visibility', 'none');
-
-       map.setLayoutProperty(layer,'visibility', 'visible');
-       return layer;
+   if ( id === 'all' ) {
+    alert("DUDE!");
+  //  map.setLayoutProperty(this.id,'visibility', e.target.checked ? 'visible' : 'none');
+    } 
+    else if ( id === this.id ) {
+  //  map.setLayoutProperty('PA2','visibility', e.target.checked ? 'visible' : 'none');
+    map.setLayoutProperty(this.id,'visibility', e.target.checked ? 'visible' : 'none');
+    } 
+    else {
+  //     map.setLayoutProperty(id,'visibility', 'visible');
+       return id;
     }
-
-};
-*/
-/*
-              // When the checkbox changes, update the visibility of the layer.
-              var input = document.getElementById('CMP_Layers');
-input.addEventListener('change', function(e) {
-  alert(e.value);
-map.setLayoutProperty('PA1','visibility', e.target.checked ? 'visible' : 'none');
 });
-*/
+
+
+//Document Ready
+$(document).ready(function() {
+    //layer group check all functionality
+    $('input.checked_all').on('change', function() {
+        //var listPanel = $(this)
+        var $element = $(this);
+        if ($element.prop('checked') == true) {
+            $element.siblings('.checkbox').find('input').prop('checked', true).change();
+        } else {
+            $element.siblings('.checkbox').find('input').prop('checked', false).change();
+        }
+    });
+
+});
+
+map.on('click', function (e) {
+    var bbox = [[e.point.x - 5, e.point.y - 5],[e.point.x + 5, e.point.y + 5]];
+    var features = map.queryRenderedFeatures(bbox, {layers: ['PA1','PA2','PA3','PA4','PA5','PA6','PA7','PA8','PA9','PA10','PA11','PA12','PA13','PA14','PA15','PA16','PA17']});
+
+      if (!features.length) {
+        //  console.log(e.lngLat);
+    //    let numbers = e.lngLat;
+   //     numbers = JSON.parse(numbers);
+  //    alert(numbers);
+     //  alert (e.lngLat);
+        return;
+      }
+
+      var content = '';
+
+      for(var i = 0; i<features.length; i++) {
+        var cmp = features[i].properties.CMP_ID
+        var dir = features[i].properties.SUB_ID 
+        var tti = features[i].properties.TTI
+        var vc = features[i].properties.LRP_VC
+        var transcore = features[i].properties.TransScore
+        var rail = features[i].properties.RailPoint
+
+         var newSet = '<div id="pm_info"><h3 style="background-color:#E0E0E0"><i class="glyphicon glyphicon-stats"></i>&nbsp; Performance Measures</h3>The scores below are for the selected roadway segments<br>' +
+                    '<B>Road Name:</B> ' + cmp + 
+                    '<br><B>Direction:</B> ' + dir 
+                  ;
+        content += newSet
+      }
+
+      info.innerHTML = content;
+});
+
+// Create a popup, but don't add it to the map yet.
+var popup = new mapboxgl.Popup({
+closeButton: false,
+closeOnClick: false
+});
+
+map.on('mouseenter', 'PA1', function(e) {
+// Change the cursor style as a UI indicator.
+map.getCanvas().style.cursor = 'pointer';
+ 
+var coordinates = e.features[0].geometry.coordinates.slice();
+var description = e.features[0].properties.description;
+ console.log(coordinates);
+// Ensure that if the map is zoomed out such that multiple
+// copies of the feature are visible, the popup appears
+// over the copy being pointed to.
+//while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+//coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+//}
+ 
+// Populate the popup and set its coordinates
+// based on the feature found.
+//popup
+//.setLngLat(coordinates)
+//.setHTML(description)
+//.addTo(map);
+});
+ 
+map.on('mouseleave', 'PA1', function() {
+map.getCanvas().style.cursor = '';
+//popup.remove();
+});
+/*
+
 
     // Toggle individual CMP corridor layers
-/*    $('input:checkbox[name="overlayLayers"]').on('change', function(e) {
+   $('input:checkbox[name="overlayLayers"]').on('change', function(e) {
 
       // get a handle on the selected checkbox & its state
       var layerID = e.target.id
