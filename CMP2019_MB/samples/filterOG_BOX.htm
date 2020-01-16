@@ -141,9 +141,9 @@ value="100"
     var map = new mapboxgl.Map({
         container: 'map',
        style: 'mapbox://styles/mapbox/light-v10',
-     //   style:'mapbox://styles/mapbox/navigation-preview-night-v4',
-     //   style:'mapbox://styles/mapbox/navigation-guidance-night-v4',
-    //      style:'mapbox://styles/crvanpollard/ck5fpyqti0v971itf7edp2eyd',
+      //  style:'mapbox://styles/mapbox/navigation-preview-night-v4',
+     //  style:'mapbox://styles/mapbox/navigation-guidance-night-v4',
+     //    style:'mapbox://styles/crvanpollard/ck5fpyqti0v971itf7edp2eyd',
         center: [   -75.170669,    40.08], 
 
         zoom: 9
@@ -354,22 +354,33 @@ break;
             console.log('failed because: ', status)
           })
 
-
-
-
-          slider.addEventListener('input', function(e) {
-
-        //    var allLayers = "PA17";
-// Adjust the layers opacity. layer here is arbitrary - this could
-// be another layer name found in your style or a custom layer
-// added on the fly using `addSource`.
-map.setPaintProperty('PA17','fill-opacity',parseInt(e.target.value, 10) / 100);
-// Value indicator
-sliderValue.textContent = e.target.value + '%';
-});
-
     });
 
+
+/* var slide = function(e) {
+//alert(e.target.value);
+let a = ['PA1','PA2','PA3','PA4','PA5','PA6','PA7','PA8','PA9','PA10','PA11','PA12','PA13','PA14','PA15','PA16','PA17','NJ1','NJ2','NJ3','NJ4','NJ5','NJ6','NJ7','NJ8','NJ9','NJ10','NJ11','NJ12','NJ13','NJ14','NJ15','NJ16','NJ17'];
+for (let index = 0; index < a.length; ++index) {
+    let value = a[index];
+      map.setPaintProperty(value,'fill-opacity',parseInt(e.target.value, 10) / 100);
+// Value indicator
+sliderValue.textContent = e.target.value + '%';
+ //   let value = a[index];
+  // console.log(value);
+}
+
+}
+*/
+slider.addEventListener('input', function(e) {
+  //slide(e);
+  let a = ['PA1','PA2','PA3','PA4','PA5','PA6','PA7','PA8','PA9','PA10','PA11','PA12','PA13','PA14','PA15','PA16','PA17','NJ1','NJ2','NJ3','NJ4','NJ5','NJ6','NJ7','NJ8','NJ9','NJ10','NJ11','NJ12','NJ13','NJ14','NJ15','NJ16','NJ17'];
+for (let index = 0; index < a.length; ++index) {
+    let value = a[index];
+      map.setPaintProperty(value,'fill-opacity',parseInt(e.target.value, 10) / 100);
+// Value indicator
+sliderValue.textContent = e.target.value + '%';
+}
+});
 
 // Toggle individual CMP corridor layers
 $('input:checkbox[name="overlayLayers"]').on('change', function(e) {
