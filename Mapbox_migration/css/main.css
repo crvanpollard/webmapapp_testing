@@ -1,0 +1,347 @@
+    html, body, #map, #sidebar, #container {
+        height: 100%;
+        margin: 0px;
+    }
+    #sidebar {     
+       border-right: 1px solid #E2E2E2;
+       background-color:white;
+    }
+    body {
+        padding-top: 50px;
+    }
+    label {
+        font-weight: normal;
+    }
+    .panel-heading a:hover {
+        text-decoration: none;
+    }
+    #loading {
+        position: absolute;
+        width: 220px;
+        height: 19px;
+        top: 50%;
+        left: 50%;
+        margin: -10px 0 0 -110px;
+        z-index: 20001;
+    }
+    .navbar .navbar-brand {
+        font-weight: bold;
+        font-size: 22px;
+        color: white;
+        white-space: nowrap;
+    }
+    .navbar-inverse{
+    background-color:#0074ad;
+    border: none;
+    }
+    .navbar-inverse .navbar-nav > li > a {
+        color: white;
+    }
+    .tt-dropdown-menu {
+        overflow: auto;
+    }
+    .tt-hint, .tt-query {
+        display: block;
+        width: 100%;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+    .typeahead-header {
+        margin: 0 5px 5px 5px;
+        padding: 3px 0;
+        border-bottom: 1px solid #ccc;
+    }
+    .search-container {
+        width: 250px;
+    }
+    #searchbox {
+        -webkit-border-top-left-radius: 4px;
+        -webkit-border-bottom-left-radius: 4px;
+        -moz-border-top-left-radius: 4px;
+        -moz-border-bottom-left-radius: 4px;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+    .modal-header {
+     background-color:;
+    }
+    .modal-title  {
+    color: white;
+    }
+    .close {
+        float: right;
+        font-size: 21px;
+        font-weight: bold;
+        line-height: 1;
+        color: black;
+        text-shadow: 0px 1px 0px rgb(255, 255, 255);
+        opacity: 1;
+    }
+    .panel-primary >.panel-heading {
+    background-color:;
+    color: black;
+    }
+    .panel-primary {
+        border-color: ;
+    }
+    .media{
+    padding: 0px 10px 0px 10px;
+    }
+    h3, .h3{
+    font-size: 16px;
+    font-weight: bold;
+    }
+    .btn-primary {
+    background-color: #333A97;
+    border-color: #333A97;
+    height:35px;
+    }
+    #toolbar{
+    background-color: #FFC709;
+    border-top: 2px solid white;
+    }
+    .leaflet-label {
+    background: rgb(235, 235, 235);
+    background: rgba(235, 235, 235, 0.81);
+    background-clip: padding-box;
+    border-color: #777;
+    border-color: rgba(0,0,0,0.25);
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 4px;
+    color: #111;
+    display: block;
+    font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    padding: 1px 6px;
+    position: absolute;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 6;
+    }
+    .leaflet-label.leaflet-clickable {
+    cursor: pointer;
+    pointer-events: auto;
+    }
+    .leaflet-label:before,
+    .leaflet-label:after {
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    content: none;
+    position: absolute;
+    top: 5px;
+    }
+    .leaflet-label:before {
+    border-right: 6px solid black;
+    border-right-color: inherit;
+    left: -10px;
+    }
+    .leaflet-label:after {
+    border-left: 6px solid black;
+    border-left-color: inherit;
+    right: -10px;
+    }
+    .leaflet-label-right:before,
+    .leaflet-label-left:after {
+    content: "";
+    }
+
+    .form-control {
+    border-radius: 0px;
+    }
+    .input-group{
+    width:200px;
+    }
+    .leaflet-control-zoom,.leaflet-control-layers {
+    border:none;
+    }
+    .form-control{
+    border-radius:0px;
+    }
+    a.one, a.one:hover, a.one:focus {
+            color: #0084C8;
+            text-decoration:underline;
+            }   
+    .
+    .navbar-inverse .navbar-nav > .dropdown > a .caret {
+        border-top-color: white;
+        border-bottom-color: white;
+    }
+    .labelfield{font-size: 10;
+            color: black;
+            margin-bottom: 4px;
+            .icon{width:35px;
+    }
+    .dropdown > ul> li > a:hover, .dropdown > ul>  li > a:focus {
+        background-color: #0084C8!important;
+        text-decoration: none;
+    }
+    .btn-primary:hover,.btn-primary:focus,.btn-primary:active,.btn-primary.active,.open .dropdown-toggle.btn-primary{
+        color:#fff;
+        background-color:#5B6BFC;
+        border-color:#0084C8
+    }
+    .labelfield{font-size: 10;
+        color: black;
+    }
+    .panel-default > .panel-heading {
+        background-color: #282828;
+        border-color: black;
+        color: white;
+    }   
+    }
+/*     a, a:hover, a:focus {
+        color: black;
+        text-decoration: none;
+    }
+*/    
+    .panel-default {
+        border-color: black;
+    }
+    .nav-tabs {
+        border-bottom: 1px solid black;
+    }
+  /*  .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+        color: #555;
+        cursor: default;
+        background-color: white;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #000 #000 transparent;
+        -moz-border-top-colors: none;
+        -moz-border-right-colors: none;
+        -moz-border-bottom-colors: none;
+        -moz-border-left-colors: none;
+        border-image: none;
+    } */
+    li.one {
+    margin-left: 35px;
+    font-style: italic;
+    }
+    .panel-default > .panel-heading {
+        background-color: #6FAA7C;
+        border-color: #DDD;
+        color: #333;
+    }
+    .panel-group .panel {
+        margin-top: -11px;
+        overflow: hidden;
+        border-radius: 0px;
+    }
+    .shield {
+        vertical-align: middle;
+        height: 30px;
+        width: 33px;
+        padding-right:5px;
+    }
+    .label {font-size: 20px;
+        color: black;
+        margin-left:-10px;
+        }
+    .nav-tabs > li.active > a,
+    .nav-tabs > li.active > a:hover,
+    .nav-tabs > li.active > a:focus{
+        color: w;
+        background-color: white;  
+    }   
+    .nav-tabs > li {
+        float: left;
+        margin-bottom: -1px;
+    }
+    #myTab li a { border-color:black;background-color:#0074ad;color:white; }
+    #myTab li.active a {border-bottom-color: transparent; background-color:white; font-weight: bold; color:black; }
+
+    .leaflet-control-zoom,.leaflet-control-layers {
+    border:none;
+    }
+    input[type=range] {
+    -webkit-appearance: none;
+    height:130px;
+    cursor: pointer;
+    }
+     #slidercase {
+        display:block;
+        position: absolute;
+     /*   bottom: 10px;
+        left: 5px;
+        */
+        z-index: 1001;
+        padding: 8px;
+        background: rgba(140, 140, 140, 0.85);
+        cursor: pointer;
+    }
+    #side1 {
+      float: right;
+      width: 100%;
+    }
+    #side2 {
+      float: left;
+      width: 200px;
+      margin-left: -200px;
+    }
+    .checkbox label {
+        font-size: 11px;
+    }
+    .checked_corridor {
+        -webkit-column-count: 2; /* Chrome, Safari, Opera */
+        -webkit-column-gap: 100px; /* Chrome, Safari, Opera */
+        -webkit-column-width: 100px;
+        -moz-column-count: 2; /* Firefox */
+        -moz-column-gap: 40px; /* Firefox */
+        -moz-column-width: 50px;
+        column-count: 2;       
+        column-gap: 10px;
+        column-width: 20px;
+    }
+    .popup {
+        max-width: 300px;
+      /*  font-family: cursive; */
+    }
+    #info-icon {
+        color: #aaa8a8;
+        margin-right: 5px;
+        cursor: pointer;
+    }
+    .modal-header {
+        padding: 10px 15px 5px !important;
+        background-color: #24abe2 !important;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        color: #FFF;
+    }
+    .modal-body .nav > li > a {
+        padding: 10px 8px !important;
+    }
+    #reduceTabs {
+        border-bottom: 0px solid black;
+    }  
+    .legend-red {
+        color: #FA3411;
+        font-size: 20px;
+        vertical-align: top;
+    }
+    .legend-orange {
+        color: #FFBA30;
+        font-size: 20px;
+        vertical-align: top;
+    }
+    .legend-blue{
+        color: #00A8DF;
+        font-size: 20px;
+        vertical-align: top;
+    }
+    .legend-green {
+        color: #87BB40;
+        font-size: 20px;
+        vertical-align: top;
+    }
+    a.zoomToCMP:link {color:#333;font-size: 11px;cursor: pointer;}
+    a.zoomToCMP:visited {color:#333;font-size: 11px;cursor: pointer;}
+    a.zoomToCMP:hover {color:#333;font-size: 11px;cursor: pointer;}
+    .leaflet-fade-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-zoom-animated { will-change:auto !important; }
