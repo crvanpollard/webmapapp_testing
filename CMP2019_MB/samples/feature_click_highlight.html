@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>HTML markers from geoJSON url</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.16.0/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.16.0/mapbox-gl.css' rel='stylesheet'/>
+<style>
+body { margin:0; padding:0; }
+#map { position:absolute; top:0; bottom:0; width:100%; }
+</style>
+</head>
+<body>
+<div id='map'></div>
+
+<script>
+var TTI;
+mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6Ii00ZklVS28ifQ.Ht4KwAM3ZUjo1dT2Erskgg';
+  
+    var map = new mapboxgl.Map({
+        container: 'map',
+       style: 'mapbox://styles/mapbox/light-v10',
+      //  style:'mapbox://styles/mapbox/navigation-preview-night-v4',
+     //  style:'mapbox://styles/mapbox/navigation-guidance-night-v4',
+     //    style:'mapbox://styles/crvanpollard/ck5fpyqti0v971itf7edp2eyd',
+        center: [   -75.170669,    40.08], 
+
+        zoom: 9
+    });
+
+map.on('style.load', function () {
+   map.addLayer({
+          id: "TTI",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TTI+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "TTI"], .5],
+                    "#f5b041",
+                    ["==", ["get", "TTI"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "TTI"], .5],
+                    6,
+                    ["==", ["get", "TTI"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "TTI"], .5],
+                    .4,
+                    ["==", ["get", "TTI"], 1],
+                    .8,
+                    0
+                  ],
+          }
+       //       firstSymbolId
+      });
+
+map.on('click', function(e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: ['m_streets'] });
+    if (!features.length) {
+        return;
+    }
+    if (typeof map.getLayer('selectedRoad') !== "undefined" ){         
+        map.removeLayer('selectedRoad')
+        map.removeSource('selectedRoad');   
+    }
+    var feature = features[0];
+    //I think you could add the vector tile feature to the map, but I'm more familiar with JSON
+    console.log(feature.toJSON());
+    map.addSource('selectedRoad', {
+        "type":"geojson",
+        "data": feature.toJSON()
+    });
+    map.addLayer({
+        "id": "selectedRoad",
+        "type": "line",
+        "source": "selectedRoad",
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "yellow",
+            "line-width": 8
+        }
+    });
+});
+});
+
+</script>
+</body>
+</html>

@@ -182,7 +182,7 @@ map.on('load', function () {
             "line-cap": "round"
         },
          layout: {
-   visibility: "none"
+   visibility: "visible"
   },
         paint: {
            "line-color":
@@ -222,6 +222,37 @@ map.on('load', function () {
         ;
       info.innerHTML = content;
     });
+
+    map.on('click', function(e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: ['RSE'] });
+    if (!features.length) {
+        return;
+    }
+    if (typeof map.getLayer('selectedRoad') !== "undefined" ){         
+        map.removeLayer('selectedRoad')
+        map.removeSource('selectedRoad');   
+    }
+    var feature = features[0];
+    //I think you could add the vector tile feature to the map, but I'm more familiar with JSON
+    console.log(feature.toJSON());
+    map.addSource('selectedRoad', {
+        "type":"geojson",
+        "data": feature.toJSON()
+    });
+    map.addLayer({
+        "id": "selectedRoad",
+        "type": "line",
+        "source": "selectedRoad",
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "yellow",
+            "line-width": 8
+        }
+    });
+});
 
     // Change the cursor to a pointer when the mouse is over the places layer.
     map.on('mouseenter', 'RSE', function () {
