@@ -174,7 +174,8 @@ map.on('load', function () {
         type: "line",
         source: {
             "type": "geojson",
-            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TTI+%3E+0&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token="
+            "data": "https://opendata.arcgis.com/datasets/6e8aef56bea14bc5973c6d865315e562_5.geojson"
+          //  "data":"rg/portal/rest/services/Transportation/PedestrianNetwork_lfeatureEncoding=esrie&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token="
             //"data": RSE
         },
         layout: {
@@ -185,15 +186,7 @@ map.on('load', function () {
    visibility: "none"
   },
         paint: {
-           "line-color":
-                [
-                "case",
-                  ["==", ["get", "TTI"], .5],
-                  "#f26522",
-                  ["==", ["get", "TTI"], 1],
-                  "#223860",
-                  "#cccccc"
-                ],
+           "line-color": "#565656",
             "line-width": 2
         }
     });

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Filter symbols by toggling a list</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<!-- Load Esri Leaflet from CDN -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; };
+</style>
+</head>
+<body>
+<style>
+      #legendBox {
+    position: absolute;
+    background:white;
+    height:150px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+
+</style>
+<div id="map"></div>
+
+<div id="legendBox">
+
+              <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-collapse collapse in" id="overlay-layers">
+                        <div class="panel-body" style="padding: 0px 15px;">
+                          <div class="radio">
+                            <label><input checked="checked"  id='none' type='radio' name="optradio" value='none' onClick='toggleLayer(none);' >None</label>
+                          </div>
+
+                          <h5><B>Load GeoJson from DVRPC Esri REST </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw()'></i></h5>
+                          <div class="radio">
+                            <label><input id='TTI_PM' type='radio' name="optradio" value='sidewalks' onClick='toggleLayer(TTI_PM);'>Sidewalks</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+</div> 
+
+<script>
+var sidewalks,all;
+var layer;
+function toggleLayer(e){
+  //  console.log(e);
+    var layer = e.value;
+    map.setLayoutProperty('sidewalks', 'visibility', 'none');
+
+   // this_layer.setMap(map);
+
+   // shownLayer = this_layer;
+
+    if ( layer === 'none' ) {
+        info.innerHTML = '';
+        map.setLayoutProperty('sidewalks', 'visibility', 'none');
+    } else {
+       map.setLayoutProperty(layer,'visibility', 'visible');
+       return layer;
+    }
+
+};
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
+  
+    var map = new mapboxgl.Map({
+        container: 'map',
+      // style: 'mapbox://styles/mapbox/streets-v11',
+         style: 'mapbox://styles/mapbox/light-v10',
+    //  style:'mapbox://styles/mapbox/navigation-guidance-night-v4',
+       //       style:'mapbox://styles/crvanpollard/ck4edq5c250ra1cn0tl6qa96o',
+        center: [ -75.170669,39.950143], 
+        zoom: 9
+    });
+
+
+    map.on('load', function() {
+            var layers = map.getStyle().layers;
+            // Find the index of the first symbol layer in the map style
+            var firstSymbolId;
+            for (var i = 0; i < layers.length; i++) {
+            if (layers[i].type === 'symbol') {
+            firstSymbolId = layers[i].id;
+            break;
+            }
+            }
+
+    map.addLayer({
+        id: "sidewalks",
+        type: "line",
+        source: {
+            "type": "geojson",
+          "data": "https://opendata.arcgis.com/datasets/6e8aef56bea14bc5973c6d865315e562_5.geojson"
+        
+        },
+         layout: {
+         visibility: "none"
+        },
+        paint: {
+           "line-color": "#0000FF",
+            "line-width": 2
+        },
+            firstSymbolId
+    });
+
+
+    });
+</script>
+
+</body>
+</html>
