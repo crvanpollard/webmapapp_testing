@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Demo: Add custom markers in Mapbox GL JS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans"
+      rel="stylesheet"
+    />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <style>
+     
+     body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      .marker {
+        background-image: url('https://raw.githubusercontent.com/crvanpollard/AccessScore/master/img/btn/AS.png');
+        background-size: cover;
+        width: 150px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+.marker2 {
+        background-image: url('https://raw.githubusercontent.com/crvanpollard/AccessScore/master/img/btn/CS.png');
+        background-size: cover;
+        width: 150px;
+        height: 50px;
+        border-radius: 40%;
+        cursor: pointer;
+      }
+.marker3 {
+        background-image: url('https://raw.githubusercontent.com/crvanpollard/AccessScore/master/img/btn/PS.png');
+        background-size: cover;
+        width: 150px;
+        height: 50px;
+        border-radius: 30%;
+        cursor: pointer;
+      }
+      .mapboxgl-popup {
+        max-width: 200px;
+      }
+      .mapboxgl-popup-content {
+        text-align: center;
+        font-family: 'Open Sans', sans-serif;
+      }
+    
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+     
+     mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6Ii00ZklVS28ifQ.Ht4KwAM3ZUjo1dT2Erskgg';
+
+const geojson = {
+  'type': 'FeatureCollection',
+  'features': [
+    {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': [-75.26286053794338, 40.0172853418569 ]
+      },
+      'properties': {
+        'title': 'Mapbox',
+        'marker':'marker2',
+        'description': 'Characteristics within the existing all ages and abilities cycle shed (up to 2 miles)'
+      }
+    },
+     {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': [-75.2391797969723, 40.009899191769556 ]
+      },
+      'properties': {
+        'title': 'Mapbox',
+        'marker':'marker',
+        'description': 'Characteristics within 2 miles of the station'
+      }
+    },
+    {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': [-75.26195788546194, 40.006993670252754]
+      },
+      'properties': {
+        'title': 'Mapbox',
+        'marker':'marker3',
+        'description': 'Characteristics within the existing sidewalk network shed (up to 1 mile)'
+      }
+    }
+  ]
+};
+
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v10',
+  center: [-75.2613555495842,40.00551679655898 ],
+  zoom: 13
+});
+// var marker= e.features[0].marker;
+// add markers to map
+for (const feature of geojson.features) {
+  // create a HTML element for each feature
+  const el = document.createElement('div');
+  el.className = feature.properties.marker;
+
+  // make a marker for each feature and add it to the map
+  new mapboxgl.Marker(el)
+    .setLngLat(feature.geometry.coordinates)
+    .setPopup(
+      new mapboxgl.Popup({ offset: 25 }) // add popups
+        .setHTML(
+          `<h3>${feature.properties.marker}</h3><p>${feature.properties.description}</p>`
+        )
+    )
+    .addTo(map);
+}
+
+map.on('load', () => {
+ // When the map loads, add the data from the USGS earthquake API as a source
+ map.addSource('as_osm_limits', {
+  'type': 'vector',
+  url:'https://tiles.dvrpc.org/data/access-score.json'
+});
+map.addSource('bs_limit', {
+  'type': 'vector',
+  url:'https://tiles.dvrpc.org/data/access-score.json'
+});
+map.addSource('ws_limit', {
+  'type': 'vector',
+  url:'https://tiles.dvrpc.org/data/access-score.json'
+});
+map.addSource('as_2mile', {
+    type:'geojson',
+        data:'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/AccessScore/FeatureServer/7/query?where=1%3D1&outFields=*&outSR=4326&f=geojson',
+        generateId: true //
+});
+    map.addLayer(
+      {
+      "id": "as_osm_limits",
+      "type": "line",
+      "source": "as_osm_limits",
+      "source-layer": "as_osm_limits",
+      'filter':['==', 'dvrpc_id', 6],
+      'paint': {
+      'line-color': '#3bb8ad',
+      'line-opacity':.8,
+      'line-width': 
+      {
+        "base": 9,
+        "stops": [
+          [10, 1],
+          [12, 2],
+          [13, 4]
+        ]
+      }
+    },
+      "layout": { 
+       "visibility": "visible",
+       'line-join': 'round',
+       'line-cap': 'round' }
+      },
+      'road-rail'
+    );
+    map.addLayer(
+      {
+      "id": "bs_limit",
+      "type": "line",
+      "source": "bs_limit",
+      "source-layer":"cycle_lowstress_limits",
+      'filter':['==', 'dvrpc_id', 6],
+      'paint': {
+      'line-color':'#Df73FF',
+      'line-opacity':.8,
+      'line-width': 
+      {
+        "base": 9,
+        "stops": [
+          [10, 1],
+          [12, 2],
+          [13, 3.5]
+        ]
+      }
+    },
+      "layout": { 
+        "visibility": "visible",
+       'line-join': 'round',
+       'line-cap': 'round' }
+      },
+      'road-rail'
+    );
+    map.addLayer(
+      {
+        "id": "ws_limit",
+        "type": "line",
+        "source": "ws_limit",
+        "source-layer":"walk_pednetwork_limits",
+        'filter':['==', 'dvrpc_id', 6],
+        'paint': {
+          // Orange
+          'line-color': '#efa801',
+          'line-opacity':.8,
+          'line-width': 
+          {
+            "base": 9,
+            "stops": [
+              [10, 1],
+              [12, 2],
+              [13, 3]
+            ]
+          }
+        },
+          "layout": { 
+            "visibility": "visible",
+           'line-join': 'round',
+           'line-cap': 'round' }
+      },
+      'road-rail'
+    );
+    map.addLayer(
+      {
+        "id": "as_2mile",
+        "type": "fill",
+        "source": "as_2mile",
+        'filter':['==', 'dvrpc_id', 6],
+        "paint": {
+          // "fill-color": "rgba(48, 149, 140, 0.5)"
+          "fill-color": "rgba( 245, 245, 245, 0.1)"
+        }
+    }
+    );
+
+})
+
+
+    </script>
+  </body>
+</html>
