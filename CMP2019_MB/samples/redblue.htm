@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Filter symbols by toggling a list</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<!-- Load Esri Leaflet from CDN -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; };
+</style>
+</head>
+<body>
+<style>
+      #legendBox {
+    position: absolute;
+    background:white;
+    height:700px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+</style>
+<div id="map"></div>
+ <div id="legendBox">
+    <label for="id1">Red</label>
+    <input id="id1" type="checkbox" value="1" class="filter" checked/>
+    <label for="id2">Yellow</label>
+    <input id="id2" type="checkbox" value="2" class="filter"/>
+    <label for="id3">Blue</label>
+    <input id="id3" type="checkbox" value="3" class="filter" checked/>
+    
+      <div class="panel-group">
+        <div class="panel panel-default">
+          <div class="panel-collapse collapse in" id="overlay-layers">
+            <div class="panel-body" style="padding: 0px 15px;">
+             <div class="checked_corridor">
+                <input type="checkbox"  class="checked_all" style="margin-top:0px" checked>&nbsp;Select/Clear All               
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA1" checked><img src='img/PA1.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.134446' , '-75.194426' ),11); return false;">1 - I-276 (PA Turnpike)</a></span> </div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA2" checked><img src='img/PA2.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.069574' , '-75.305552' ),10); return false;">2 - I-476</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA3" checked><img src='img/PA3.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.031235' , '-75.245402' ),11); return false;">3 - I-76 &amp; I-676</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA4" checked><img src='img/PA4.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.013267' , '-75.062184' ),11); return false;">4 - I-95</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA5" checked><img src='img/PA5.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '39.943069' , '-75.331134' ),11); return false;">5 - US 1</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA6" checked><img src='img/PA6.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '39.889125' , '-75.300722' ),11); return false;">6 - US 13/MacDade Blvd/PA 291</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA7" checked><img src='img/PA7.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.029507' , '-75.574676' ),11); return false;">7 -  US 30 </a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA8"checked><img src='img/PA8.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.083956' , '-75.404767' ),11); return false;">8 - US 202, 322, 30, PA 100</a></span> </div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA9" checked><img src='img/PA9.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.15957' , '-75.492535' ),11); return false;">9 - US 422</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA10" checked><img src='img/PA10.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '39.968494' , '-75.297532' ),11); return false;">10 - PA 3 &amp; Center City</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA11" checked><img src='img/PA11.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.258863' , '-75.38661' ),11); return false;">11 - PA 113 Area</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA12" checked><img src='img/PA12.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.18919' , '-75.128668' ),11); return false;">12 - PA 132, PA 63, Co. Line Rd </a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA13" checked> <img src='img/PA13.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.207084' , '-74.993097' ),11); return false;">13 - PA 332</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA14" checked><img src='img/PA14.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.160858' , '-75.207956' ),11); return false;">14 - PA 611 &amp; PA 309</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA15" checked><img src='img/PA15.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.050975' , '-75.211544' ),11); return false;">15 - Ridge-Lincoln-Cheltenham </a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA16" checked><img src='img/PA16.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.168874' , '-75.66524' ),11); return false;">16 - PA 100 </a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA17" checked><img src='img/PA17.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '39.817038' , '-75.763032' ),11); return false;">17 - PA 41 </a></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+  var CMP_PA;
+     mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
+  
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [ -75.170669,39.950143], 
+        zoom: 9
+    });
+
+
+var url ='https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TTI+%3E+0&outFields=TTI,PTI,RoadName&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson';
+
+var featureLayer = L.mapbox.featureLayer(url).addTo(map);
+
+var inputs = document.querySelectorAll('input.filter');
+
+for (i = 0; i < inputs.length; i++) {
+  inputs[i].onchange = function () {
+    filter();
+  }
+}
+
+
+// walk about layer
+map.on('load', function () {
+
+  map.addLayer({
+  id: "CMP_PA",
+  type: "fill",
+  source: {
+            "type": "geojson",
+            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&geometryPrecision=4&outSR=4326&f=pgeojson"
+          },
+  layout: {
+   visibility: "visible"
+  },
+  paint: {
+    "fill-color": [
+        "case",
+        ["==", ["get", "CMP_ID"], 1],"#92D3C8",
+        ["==", ["get", "CMP_ID"], 2],"#F37D80",
+        ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
+        ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
+        ["==", ["get", "CMP_ID"], 5],"#FFD380",
+        ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
+        ["==", ["get", "CMP_ID"], 7],"#D7C19E",
+        ["==", ["get", "CMP_ID"], 8],"#82D4F2",
+        ["==", ["get", "CMP_ID"], 9],"#DABEDB",
+        ["==", ["get", "CMP_ID"], 10],"#B57DB6",
+        ["==", ["get", "CMP_ID"], 11],"#FAF078",
+        ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
+        ["==", ["get", "CMP_ID"], 13],"#D7D79E",
+        ["==", ["get", "CMP_ID"], 14],"#80AEDD",
+        ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
+        ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
+        ["==", ["get", "CMP_ID"], 17],"#39BF7C",
+        "#cccccc"
+      ],
+    "fill-opacity": 0.8
+  }
+});
+});
+
+
+
+
+
+
+var filter = function () {
+  var checked = [];
+  for (i = 0; i < inputs.length; i++) {
+    if (inputs[i].checked) {
+      checked.push(Number(inputs[i].value));
+    }
+  }
+  featureLayer.setFilter(function (feature) {
+    return (checked.indexOf(feature.id) != -1);
+  });
+  setStyle();
+}
+
+featureLayer.on('ready', filter);
+</script>
+
+</body>
+</html>

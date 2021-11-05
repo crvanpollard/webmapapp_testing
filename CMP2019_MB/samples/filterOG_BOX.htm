@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Filter symbols by toggling a list</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<!-- Load Esri Leaflet from CDN -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; };
+</style>
+</head>
+<body>
+<style>
+      #legendBox {
+    position: absolute;
+    background:white;
+    height:700px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+    padding: 10px 5px;
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+ #info {
+    position: absolute;
+    background:white;
+    height:300px;
+    width:310px;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+    .mapboxgl-popup {
+max-width: 400px;
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.map-overlay {
+font: bold 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+position: absolute;
+width: 25%;
+bottom: 0;
+left: 0;
+padding: 10px;
+}
+ 
+.map-overlay .map-overlay-inner {
+background-color: #fff;
+box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+border-radius: 3px;
+padding: 10px;
+margin-bottom: 10px;
+}
+ 
+.map-overlay label {
+display: block;
+margin: 0 0 10px;
+}
+ 
+.map-overlay input {
+background-color: transparent;
+display: inline-block;
+width: 100%;
+position: relative;
+margin: 0;
+cursor: ew-resize;
+}
+</style>
+<div id="map"></div>
+<div id="info"></div>
+ 
+<div class="map-overlay top">
+<div class="map-overlay-inner">
+<label>Layer opacity: <span id="slider-value">100%</span></label>
+<input
+id="slider"
+type="range"
+min="0"
+max="100"
+step="0"
+value="100"
+/>
+</div>
+</div>
+
+ <div id="legendBox">
+      <div class="panel-group">
+        <div class="panel panel-default">
+          <div class="panel-collapse collapse in" id="overlay-layers">
+            <div class="panel-body" style="padding: 0px 15px;">
+             <div class="checked_corridor" id="CMP_Layers">
+                <input type="checkbox"  name="overlayLayers" id="all" class="checked_all" checked>&nbsp;Select/Clear All               
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA1" checked><img src='img/PA1.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.flyTo({center:[-75.194426,40.134446], zoom: 10,speed:.20,bearing: -5,pitch: 15});return false;">1 - I-276 (PA Turnpike)</a></span> </div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA2" checked><img src='img/PA2.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.069574' , '-75.305552' ),10); return false;">2 - I-476</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA3" checked><img src='img/PA3.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.031235' , '-75.245402' ),11); return false;">3 - I-76 &amp; I-676</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA4" checked><img src='img/PA4.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.013267' , '-75.062184' ),11); return false;">4 - I-95</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA5" checked><img src='img/PA5.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '39.943069' , '-75.331134' ),11); return false;">5 - US 1</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA6" checked><img src='img/PA6.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '39.889125' , '-75.300722' ),11); return false;">6 - US 13/MacDade Blvd/PA 291</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA7" checked><img src='img/PA7.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.029507' , '-75.574676' ),11); return false;">7 -  US 30 </a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA8"checked><img src='img/PA8.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.083956' , '-75.404767' ),11); return false;">8 - US 202, 322, 30, PA 100</a></span> </div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA9" checked><img src='img/PA9.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.15957' , '-75.492535' ),11); return false;">9 - US 422</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA10" checked><img src='img/PA10.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '39.968494' , '-75.297532' ),11); return false;">10 - PA 3 &amp; Center City</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA11" checked><img src='img/PA11.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.258863' , '-75.38661' ),11); return false;">11 - PA 113 Area</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA12" checked><img src='img/PA12.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.18919' , '-75.128668' ),11); return false;">12 - PA 132, PA 63, Co. Line Rd </a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA13" checked> <img src='img/PA13.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.207084' , '-74.993097' ),11); return false;">13 - PA 332</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA14" checked><img src='img/PA14.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.160858' , '-75.207956' ),11); return false;">14 - PA 611 &amp; PA 309</a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA15" checked><img src='img/PA15.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.050975' , '-75.211544' ),11); return false;">15 - Ridge-Lincoln-Cheltenham </a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA16" checked><img src='img/PA16.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '40.168874' , '-75.66524' ),11); return false;">16 - PA 100 </a></span></div>
+                <div class="checkbox"><label><input type="checkbox" class="layer" name="overlayLayers" id="PA17" checked><img src='img/PA17.png' width='26' height='29'></label><span>&nbsp;<a href="#" class="zoomToCMP" onclick="map.setView(new L.LatLng( '39.817038' , '-75.763032' ),11); return false;">17 - PA 41 </a></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<script>
+    var CMP_PA = 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&geometryPrecision=4&outSR=4326&f=pgeojson';
+    var CMP_NJ = 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_SubcorridorsEmergingCorridors/FeatureServer/1/query?where=1%3D1&outFields=*&returnGeometry=true&geometryPrecision=4&outSR=4326&f=pgeojson';
+    var allIDs = [];
+    var filterGroup = document.getElementById('filter-group');
+    var layerID;
+    var hoveredStateId = null;
+    
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6Ii00ZklVS28ifQ.Ht4KwAM3ZUjo1dT2Erskgg';
+  
+    var map = new mapboxgl.Map({
+        container: 'map',
+       style: 'mapbox://styles/mapbox/light-v10',
+      //  style:'mapbox://styles/mapbox/navigation-preview-night-v4',
+     //  style:'mapbox://styles/mapbox/navigation-guidance-night-v4',
+     //    style:'mapbox://styles/crvanpollard/ck5fpyqti0v971itf7edp2eyd',
+        center: [   -75.170669,    40.08], 
+
+        zoom: 9
+    });
+
+    var slider = document.getElementById('slider');
+var sliderValue = document.getElementById('slider-value');
+
+    map.on('load', function() {
+      var layers = map.getStyle().layers;
+// Find the index of the first symbol layer in the map style
+var firstSymbolId;
+for (var i = 0; i < layers.length; i++) {
+if (layers[i].type === 'symbol') {
+firstSymbolId = layers[i].id;
+break;
+}
+}
+// County
+ map.addLayer({
+            "id": "county",
+            "type": "line",
+            "source": {
+                type: 'vector',
+                url: 'https://tiles.dvrpc.org/data/dvrpc-municipal.json'
+            },
+            "source-layer": "county",
+            "layout": {},
+            "paint": {
+                'line-width': 2,
+                'line-color': '#434343'
+            },
+            "filter": [
+                    "==",
+                    "dvrpc",
+                    "Yes"
+            ]
+        });
+ // MCD
+  map.addLayer({
+            "id": "municipalities",
+            "type": "line",
+            "minzoom": 10,
+            "source": {
+                type: 'vector',
+                url: 'https://tiles.dvrpc.org/data/dvrpc-municipal.json'
+            },
+            "source-layer": "municipalities",
+            "layout": {},
+            "paint": {
+                'line-width': .5,
+                'line-color': '#c1c1c1'
+            },
+               firstSymbolId
+    
+     //       "filter": ["==", "dvrpc", "Yes"]
+        });
+
+
+      // Add a GeoJSON source containing CMP coordinates and information.
+        map.addSource('CMP_PA', {
+        'type': 'geojson',
+        'data': CMP_PA
+        });
+
+        map.addSource('CMP_NJ', {
+        'type': 'geojson',
+        'data': CMP_NJ
+        });
+
+
+        $.ajax(CMP_PA)
+          .done(function(data) {
+            data = JSON.parse(data)
+         //   console.log(data.features)
+
+            data.features.forEach(function(feature) {
+              var CMP_ID = feature.properties['CMP_ID'];
+              var layerID = 'PA'+ CMP_ID;
+              console.log(layerID)
+          //    allIDs.push(layerID)
+
+              // Add a layer for this symbol type if it hasn't been added already.
+              // there's something wonky with this...
+              if (!map.getLayer(layerID)) {
+                  map.addLayer({
+                      'id': layerID,
+                      'type': 'fill',
+                      'source': 'CMP_PA',
+                      'layout': {visibility:'visible'},
+                      'paint': {
+                      'fill-color': [
+                          "case",
+                          ["==", ["get", "CMP_ID"], 1],"#92D3C8",
+                          ["==", ["get", "CMP_ID"], 2],"#F37D80",
+                          ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
+                          ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
+                          ["==", ["get", "CMP_ID"], 5],"#FFD380",
+                          ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
+                          ["==", ["get", "CMP_ID"], 7],"#D7C19E",
+                          ["==", ["get", "CMP_ID"], 8],"#82D4F2",
+                          ["==", ["get", "CMP_ID"], 9],"#DABEDB",
+                          ["==", ["get", "CMP_ID"], 10],"#B57DB6",
+                          ["==", ["get", "CMP_ID"], 11],"#FAF078",
+                          ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
+                          ["==", ["get", "CMP_ID"], 13],"#D7D79E",
+                          ["==", ["get", "CMP_ID"], 14],"#80AEDD",
+                          ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
+                          ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
+                          ["==", ["get", "CMP_ID"], 17],"#39BF7C",
+                          "#cccccc"
+                        ],
+                         'fill-outline-color' :['case',['boolean', ['feature-state', 'hover'], false],"#000000","#7c7c7c" ],
+                       /*  'fill-outline-color': [
+                          "case",
+                          ["==", ["get", "CMP_ID"], 1],"#5cbdad",
+                          ["==", ["get", "CMP_ID"], 2],"#F37D80",
+                          ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
+                          ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
+                          ["==", ["get", "CMP_ID"], 5],"#FFD380",
+                          ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
+                          ["==", ["get", "CMP_ID"], 7],"#D7C19E",
+                          ["==", ["get", "CMP_ID"], 8],"#82D4F2",
+                          ["==", ["get", "CMP_ID"], 9],"#DABEDB",
+                          ["==", ["get", "CMP_ID"], 10],"#B57DB6",
+                          ["==", ["get", "CMP_ID"], 11],"#FAF078",
+                          ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
+                          ["==", ["get", "CMP_ID"], 13],"#D7D79E",
+                          ["==", ["get", "CMP_ID"], 14],"#80AEDD",
+                          ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
+                          ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
+                          ["==", ["get", "CMP_ID"], 17],"#39BF7C",
+                          "#cccccc"
+                        ],
+*/
+                        'fill-opacity' :['case',['boolean', ['feature-state', 'hover'], false],1,0.8]
+                    //  'fill-opacity': 0.8
+                      },
+                     'filter': ['==', 'CMP_ID', CMP_ID]
+                  },
+                  firstSymbolId
+    
+                  );
+                  map.on('mousemove', layerID, hoverTooltip)
+                  map.on('mouseleave', layerID, unhoverTooltip)
+              }
+                    
+            });
+          })
+          .fail(function(xhr, status) {
+            console.log('failed because: ', status)
+          })
+      
+        $.ajax(CMP_NJ)
+          .done(function(data) {
+            data = JSON.parse(data)
+          //  console.log(data.features)
+
+            data.features.forEach(function(feature) {
+              var CMP_ID = feature.properties['CMP_ID'];
+              var layerID = 'NJ'+ CMP_ID;
+          //    console.log(layerID)
+          //    allIDs.push(layerID)
+
+              // Add a layer for this symbol type if it hasn't been added already.
+              // there's something wonky with this...
+              if (!map.getLayer(layerID)) {
+                  map.addLayer({
+                      'id': layerID,
+                      'type': 'fill',
+                      'source': 'CMP_NJ',
+                      'layout': {visibility:'visible'},
+                      'paint': {
+                      'fill-color': [
+                          "case",
+                          ["==", ["get", "CMP_ID"], 1],"#92D3C8",
+                          ["==", ["get", "CMP_ID"], 2],"#F37D80",
+                          ["==", ["get", "CMP_ID"], 3],"#FBF7C0",
+                          ["==", ["get", "CMP_ID"], 4],"#F9BDBF",
+                          ["==", ["get", "CMP_ID"], 5],"#FFD380",
+                          ["==", ["get", "CMP_ID"], 6],"#C7E6DC",
+                          ["==", ["get", "CMP_ID"], 7],"#D7C19E",
+                          ["==", ["get", "CMP_ID"], 8],"#82D4F2",
+                          ["==", ["get", "CMP_ID"], 9],"#DABEDB",
+                          ["==", ["get", "CMP_ID"], 10],"#B57DB6",
+                          ["==", ["get", "CMP_ID"], 11],"#FAF078",
+                          ["==", ["get", "CMP_ID"], 12],"#DB7DB3",
+                          ["==", ["get", "CMP_ID"], 13],"#D7D79E",
+                          ["==", ["get", "CMP_ID"], 14],"#80AEDD",
+                          ["==", ["get", "CMP_ID"], 15],"#9DCB3B",
+                          ["==", ["get", "CMP_ID"], 16],"#FFEBBE",
+                          ["==", ["get", "CMP_ID"], 17],"#39BF7C",
+                          "#cccccc"
+                        ],
+                        'fill-outline-color' :['case',['boolean', ['feature-state', 'hover'], false],"#000000","#7c7c7c" ],
+                        'fill-opacity' :['case',['boolean', ['feature-state', 'hover'], false],1,0.8]
+                      },
+                     'filter': ['==', 'CMP_ID', CMP_ID]
+                  },
+                    firstSymbolId
+                  );
+                  map.on('mousemove', layerID, hoverTooltipNJ)
+                  map.on('mouseleave', layerID, unhoverTooltipNJ)
+              }
+            });
+          })
+          .fail(function(xhr, status) {
+            console.log('failed because: ', status)
+          })
+
+    });
+
+
+/* var slide = function(e) {
+//alert(e.target.value);
+let a = ['PA1','PA2','PA3','PA4','PA5','PA6','PA7','PA8','PA9','PA10','PA11','PA12','PA13','PA14','PA15','PA16','PA17','NJ1','NJ2','NJ3','NJ4','NJ5','NJ6','NJ7','NJ8','NJ9','NJ10','NJ11','NJ12','NJ13','NJ14','NJ15','NJ16','NJ17'];
+for (let index = 0; index < a.length; ++index) {
+    let value = a[index];
+      map.setPaintProperty(value,'fill-opacity',parseInt(e.target.value, 10) / 100);
+// Value indicator
+sliderValue.textContent = e.target.value + '%';
+ //   let value = a[index];
+  // console.log(value);
+}
+
+}
+*/
+slider.addEventListener('input', function(e) {
+  //slide(e);
+  let a = ['PA1','PA2','PA3','PA4','PA5','PA6','PA7','PA8','PA9','PA10','PA11','PA12','PA13','PA14','PA15','PA16','PA17','NJ1','NJ2','NJ3','NJ4','NJ5','NJ6','NJ7','NJ8','NJ9','NJ10','NJ11','NJ12','NJ13','NJ14','NJ15','NJ16','NJ17'];
+for (let index = 0; index < a.length; ++index) {
+    let value = a[index];
+      map.setPaintProperty(value,'fill-opacity',parseInt(e.target.value, 10) / 100);
+// Value indicator
+sliderValue.textContent = e.target.value + '%';
+}
+});
+
+// Toggle individual CMP corridor layers
+$('input:checkbox[name="overlayLayers"]').on('change', function(e) {
+    var id = this.id;
+
+   if ( id === 'all' ) {
+  //  alert("DUDE!");
+  //  map.setLayoutProperty(this.id,'visibility', e.target.checked ? 'visible' : 'none');
+    } 
+    else if ( id === this.id ) {
+  //  map.setLayoutProperty('PA2','visibility', e.target.checked ? 'visible' : 'none');
+    map.setLayoutProperty(this.id,'visibility', e.target.checked ? 'visible' : 'none');
+    } 
+    else {
+  //     map.setLayoutProperty(id,'visibility', 'visible');
+       return id;
+    }
+});
+
+
+//Document Ready
+$(document).ready(function() {
+    //layer group check all functionality
+    $('input.checked_all').on('change', function() {
+        //var listPanel = $(this)
+        var $element = $(this);
+        if ($element.prop('checked') == true) {
+            $element.siblings('.checkbox').find('input').prop('checked', true).change();
+        } else {
+            $element.siblings('.checkbox').find('input').prop('checked', false).change();
+        }
+    });
+
+});
+
+map.on('click', function (e) {
+    var bbox = [[e.point.x - 5, e.point.y - 5],[e.point.x + 5, e.point.y + 5]];
+    var features = map.queryRenderedFeatures(bbox, {layers: ['PA1','PA2','PA3','PA4','PA5','PA6','PA7','PA8','PA9','PA10','PA11','PA12','PA13','PA14','PA15','PA16','PA17','NJ1','NJ2','NJ3','NJ4','NJ5','NJ6','NJ7','NJ8','NJ9','NJ10','NJ11','NJ12','NJ13','NJ14','NJ15','NJ16','NJ17']});
+
+      if (!features.length) {
+        //  console.log(e.lngLat);
+    //    let numbers = e.lngLat;
+   //     numbers = JSON.parse(numbers);
+  //    alert(numbers);
+     //  alert (e.lngLat);
+        return;
+      }
+      var content = '';
+
+      for(var i = 0; i<features.length; i++) {
+        var cmp = features[i].properties.CMP_ID
+        var subid = features[i].properties.SUB_ID 
+        var banner = features[i].properties.WEB_COLOR
+        var name = features[i].properties.NAME
+        var subname = features[i].properties.SUBNAME
+        var priority = features[i].properties.PRIORITY
+        var shield = features[i].properties.SHIELD
+        var state = features[i].properties.STATE
+
+
+    var newSet = '<h4 style="color:white;background-color:' + banner + '"><div class="label"><img class="shield" src="' + shield + ' ">' + name + '</div></h4>' + "<div class='labelfield'><b>Subcorridor ID/Name: </b>" + cmp + subid + " - " + subname + "<br>" + "<div class='labelfield'><b>Priority Subcorridor: </b>" + priority + "</div>" +
+      '<img style="margin:0px 0px 5px 0px" src="https://www.dvrpc.org/asp/TIPsearch/2015/PA/img/document.png"/>&nbsp; - <a class="one" href="https://www.dvrpc.org/asp/cmp/'+ state+'CMP2019Detail.asp?corridor='+cmp+'&subcorridor='+ subid + '" target="_blank"> ' + "View Subcorridor Information" + "</a><br>" 
+    //    '<a href="#" id="zoomToBtn" class="btn btn-primary" onclick="map.setView(new L.LatLng( ' + (props.LAT) + ' , ' + (props.LONG) + ' ),12); return false;">Zoom To Subcorridor</a>' + "</div>" + "<br></br>";
+
+
+     //    var newSet = '<div id="pm_info"><h3 style="background-color:#E0E0E0"><i class="glyphicon glyphicon-stats"></i>&nbsp; Performance Measures</h3>The scores below are for the selected roadway segments<br>' +
+//                    '<B>Road Name:</B> ' + cmp + 
+  //                  '<br><B>Direction:</B> ' + dir 
+                  ;
+
+        content += newSet
+      }
+
+      info.innerHTML = content;
+});
+
+// Create a popup, but don't add it to the map yet.
+var popup = new mapboxgl.Popup({
+closeButton: false,
+closeOnClick: false
+});
+
+var hoverTooltip = function(e) {
+    popup
+    .setLngLat(e.lngLat)
+    .setHTML(e.features.map(function(feature) { return feature.properties.NAME + '('+ feature.properties.GIS_ID +')'; }).join(', '))
+    .addTo(map);
+
+    currentHover = e.features[0].id;
+
+    if (hoveredStateId !== currentHover) {
+      // remove paint (exclude first pass where hoverdStateId is undefined)
+      if(hoveredStateId){
+        map.setFeatureState(
+        { source: 'CMP_PA', id: hoveredStateId },
+        { hover: false }
+      );
+      }
+
+      // reassign hoverste and paint again
+      hoveredStateId = currentHover
+      map.setFeatureState(
+      { source: 'CMP_PA', id: currentHover },
+      { hover: true }
+      );
+    }
+}
+
+var unhoverTooltip = function(e) {
+    map.getCanvas().style.cursor = '';
+    popup.remove();
+
+  if (hoveredStateId) {
+  map.setFeatureState(
+  { source: 'CMP_PA', id: hoveredStateId },
+  { hover: false }
+  );
+  }
+  hoveredStateId = null;
+}
+
+var hoverTooltipNJ = function(e) {
+    popup
+    .setLngLat(e.lngLat)
+    .setHTML(e.features.map(function(feature) { return feature.properties.NAME + '('+ feature.properties.GIS_ID +')'; }).join(', '))
+    .addTo(map);
+
+    currentHover = e.features[0].id;
+
+    if (hoveredStateId !== currentHover) {
+      // remove paint (exclude first pass where hoverdStateId is undefined)
+      if(hoveredStateId){
+        map.setFeatureState(
+        { source: 'CMP_NJ', id: hoveredStateId },
+        { hover: false }
+      );
+      }
+
+      // reassign hoverste and paint again
+      hoveredStateId = currentHover
+      map.setFeatureState(
+      { source: 'CMP_NJ', id: currentHover },
+      { hover: true }
+      );
+    }
+}
+
+var unhoverTooltipNJ = function(e) {
+    map.getCanvas().style.cursor = '';
+    popup.remove();
+
+  if (hoveredStateId) {
+  map.setFeatureState(
+  { source: 'CMP_NJ', id: hoveredStateId },
+  { hover: false }
+  );
+  }
+  hoveredStateId = null;
+}
+
+/*
+map.on('mouseenter', 'PA1', function (e) {
+// Change the cursor style as a UI indicator.
+map.getCanvas().style.cursor = 'pointer';
+ 
+var coordinates = e.features[0].geometry.coordinates.slice();
+var description = e.features[0].properties.description;
+// console.log(coordinates);
+// Ensure that if the map is zoomed out such that multiple
+// copies of the feature are visible, the popup appears
+// over the copy being pointed to.
+//while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+//coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+//}
+ 
+// Populate the popup and set its coordinates
+// based on the feature found.
+//popup
+//.setLngLat(coordinates)
+//.setHTML(description)
+//.addTo(map);
+});
+ 
+map.on('mouseleave', 'PA1', function() {
+map.getCanvas().style.cursor = '';
+popup.remove();
+});
+
+*/
+
+</script>
+
+</body>
+</html>

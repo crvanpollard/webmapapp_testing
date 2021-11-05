@@ -38,10 +38,10 @@
   L.esri.basemapLayer('Streets').addTo(map);
 
   var bikePaths = L.esri.featureLayer({
-    url: 'http://arcgis.dvrpc.org/arcgis/rest/services/AppData/CMP_Performance/FeatureServer/1',
+    url: 'https://arcgis.dvrpc.org/portal/rest/services/Transportation/PedestrianNetwork_lines/FeatureServer/0',
     style: function (feature) {
       var c,o = 0.75;
-      switch (feature.properties.TTI) {
+      switch (feature.properties.line_type) {
         case 0:
           c = '#007D7D';
           break;

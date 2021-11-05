@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Filter symbols by toggling a list</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<!-- Load Esri Leaflet from CDN -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; };
+</style>
+</head>
+<body>
+<style>
+      #legendBox {
+    position: absolute;
+    background:white;
+    height:300px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+    #info {
+    position: absolute;
+    background:white;
+    height:300px;
+    width:310px;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+</style>
+<div id="map"></div>
+
+<div id="info"></div>
+
+<div id="legendBox">
+      <div class="panel-group">
+        <div class="panel panel-default">
+          <div class="panel-collapse collapse in" id="overlay-layers">
+            <div class="panel-body" style="padding: 0px 15px;">
+          
+        <div class='row' id='filters'>
+        <input id='all' type='radio' name='toggle' value='all' checked='checked'>
+        <label for='all'>None</label>
+        <input id='TTI' type='radio' name='toggle' value='TTI'>
+        <label for='TTI'>TTI</label>
+        <input id='PTI' type='radio' name='toggle' value='PTI'>
+        <label for='PTI'>PTI</label>
+
+      </div>
+
+              <ul id='features'></ul> 
+
+          </div>
+        </div>
+      </div>
+    </div>
+</div> 
+
+<script>
+var TTI, PTI, all;
+var info = document.getElementById('info');
+
+document.getElementById('filters').addEventListener('change', function(e) {
+      var day = e.target.value;
+      // update the map filter
+      if (day === 'TTI') {
+       map.setLayoutProperty(day, 'visibility', 'visible');
+      } else if (day === 'PTI') {
+       map.setLayoutProperty('TTI','visibility', 'none');
+       map.setLayoutProperty(day, 'visibility', 'visible');
+      } else if (day === 'all') {
+        map.setLayoutProperty('TTI','visibility', 'none');
+        map.setLayoutProperty('PTI','visibility', 'none');
+      } else {
+        map.setLayoutProperty('TTI', 'visibility', 'none');
+      };
+    });
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
+  
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [ -75.170669,39.950143], 
+        zoom: 9
+    });
+
+
+    map.on('load', function() {
+
+    map.addLayer({
+        id: "TTI",
+        type: "line",
+        source: {
+            "type": "geojson",
+            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TTI+%3E+0&outFields=TTI,PTI,RoadName&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+        },
+        layout: {
+            "visibility":"none",
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        paint: {
+           "line-color":
+                [
+                "case",
+                  ["==", ["get", "TTI"], .5],
+                  "#f5b041",
+                  ["==", ["get", "TTI"], 1],
+                  "#cb4335",
+                  "#cccccc"
+                ],
+            "line-width":
+                [
+                "case",
+                  ["==", ["get", "TTI"], .5],
+                  6,
+                  ["==", ["get", "TTI"], 1],
+                  2,
+                  0
+                ],
+                   "line-opacity":
+                [
+                "case",
+                  ["==", ["get", "TTI"], .5],
+                  .4,
+                  ["==", ["get", "TTI"], 1],
+                  .8,
+                  0
+                ],
+        }
+    });
+
+ map.addLayer({
+        id: "PTI",
+        type: "line",
+        source: {
+            "type": "geojson",
+            "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=PTI+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+        },
+        layout: {
+            "visibility":"none",
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        paint: {
+           "line-color":
+                [
+                "case",
+                  ["==", ["get", "PTI"], .5],
+                  "#f5b041",
+                  ["==", ["get", "PTI"], 1],
+                  "#cb4335",
+                  "#cccccc"
+                ],
+            "line-width":
+                [
+                "case",
+                  ["==", ["get", "PTI"], .5],
+                  6,
+                  ["==", ["get", "PTI"], 1],
+                  2,
+                  0
+                ],
+                   "line-opacity":
+                [
+                "case",
+                  ["==", ["get", "PTI"], .5],
+                  .4,
+                  ["==", ["get", "PTI"], 1],
+                  .8,
+                  0
+                ],
+        }
+    });
+ 
+
+map.on('click', 'TTI', function (e) {
+  var bbox = [[e.point.x - 5, e.point.y - 5],[e.point.x + 5, e.point.y + 5]];
+    var features = map.queryRenderedFeatures(bbox, {
+        layers: ['TTI']
+      });
+
+      if (!features.length) {
+        return;
+      }
+
+      var content = ''
+
+      for(var i = 0; i<features.length; i++) {
+        var pti = features[i].properties.PTI
+        var tti = features[i].properties.TTI
+        var roadname = features[i].properties.RoadName
+        var newSet = '<B>TTI:</B> '+ pti
+        +'<br><B>Location:</B> '+ tti
+        +'<br><B>State:</B> '+ roadname
+        + '<br>'
+        content += newSet
+      }
+
+      info.innerHTML = content;
+    });
+
+    });
+</script>
+
+</body>
+</html>

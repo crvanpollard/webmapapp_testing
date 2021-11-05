@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Filter symbols by toggling a list</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<!-- Load Esri Leaflet from CDN -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; };
+</style>
+</head>
+<body>
+<style>
+      #legendBox {
+    position: absolute;
+    background:white;
+    height:600px;
+    width:310px;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+    #selectedFeatures {
+    position: absolute;
+    background:white;
+    height:300px;
+    width:310px;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    border: 1px solid #000;
+    border-radius: 5px;
+  /*  padding: 10px 20px; */
+    box-shadow: 10px 10px 65px 0px rgba(0, 0, 0, 0.75);
+    }
+</style>
+<div id="map"></div>
+
+<div id="selectedFeatures"></div>
+
+
+<div id="legendBox">
+
+              <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-collapse collapse in" id="overlay-layers">
+                        <div class="panel-body" style="padding: 0px 15px;">
+                          
+                          <div class="radio">
+                            <label><input checked="checked"  id='none' type='radio' name="optradio" value='none' onClick='toggleLayer(none);' >None</label>
+                          </div>
+
+                          <h5><B>Reduce Congestion </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw()'></i></h5>
+                          <div class="radio">
+                            <label><input id='TTI_PM' type='radio' name="optradio" value='TTI' onClick='toggleLayer(TTI_PM);'>High Travel Time Index (TTI)</label>
+                          </div>
+                          <div class="radio">
+                            <label><input id='VC_PM' type='radio' name="optradio" value='LRP_VC' onClick='toggleLayer(VC_PM);'>Anticipated Growth in V/C</label>
+                          </div>
+                         
+                          <h5><B>Increase Accessibility &amp; Mobility </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw2()'></i></h5>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="TransScore_PM" value='TSCORE' onClick='toggleLayer(TransScore_PM);'>Transit Score and Rails Stations</label>
+                          </div>
+                          <div class="radio">
+                            <label><input id='PTI_PM' type="radio" name="optradio" value='PTI'  onClick='toggleLayer(PTI_PM);'>High Planning Time Index (PTI)</label>
+                          </div>
+                          <h5><B>Rebuild &amp; Maintain Transportation Infrastructure </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw3()'></i></h5>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id='CTN_PM' value='CTN'  onClick='toggleLayer(CTN_PM);'>Core Transportation Network</label>
+                          </div>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="Transit_PM" value='TRANSIT' onClick='toggleLayer(Transit_PM);'>Existing Transit</label>
+                          </div>
+                        
+                          <h5><B>Create a Safer Transportation System </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw4()'></i></h5>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="HighCrSev_PM" value='CRASH1' onClick='toggleLayer(HighCrSev_PM);'>High Crash Severity</label>
+                          </div>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="HighCrFreq_PM" value='CRASH2' onClick='toggleLayer(HighCrFreq_PM);' >High Crash Frequency</label>
+                          </div>
+
+                           <h5><B>Facilitate Goods Movement </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw7()'></i></h5>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="TTTI_PM" value='TTTI' onClick='toggleLayer(TTTI_PM);'>Truck Travel Time Index</label>
+                          </div>
+                        
+                          <h5><B>Create a More Secure Transportation System </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw5()'></i></h5>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="HvyTran_PM" value='HvyTran' onClick='toggleLayer(HvyTran_PM);'>Important Areas for Transportation Security Planning</label>
+                          </div>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="HHDen_PM" value='HHDen' onClick='toggleLayer(HHDen_PM);' >Areas of Special Evacuation Concern</label>
+                          </div>
+                        
+                          <h5><B>Ensure Transportation Investments Support LRP Principles </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw6()'></i></h5>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="Env_PM" value='Env' onClick='toggleLayer(Env_PM);' >Low Green Infrastructure Screening Tool Scores</label>
+                          </div>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="InfEmerg_PM" value='InfEmerg' onClick='toggleLayer(InfEmerg_PM);' >Conections 2040 - Infill and Redevelopment Areas and Emergeing Growth Areas</label>
+                          </div>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="PlanCntr_PM" value='PlanCntr' onClick='toggleLayer(PlanCntr_PM);'>Conections 2040 - Land Use</label>
+                          </div>
+
+                          <h5><B>Integrate PM3 Measures </B><i class='glyphicon glyphicon-info-sign' id='info-icon' onclick='legendraw8()'></i></h5>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="LOTTR_PM" value='LOTTR' onClick='toggleLayer(LOTTR_PM);' >Level of Travel Time Reliability</label>
+                          </div>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="PHED_PM" value='PHED' onClick='toggleLayer(PHED_PM);' >Peak Hour Excessive Delay</label>
+                          </div>
+                          <div class="radio">
+                            <label><input name="optradio" type="radio" id="TTTR_PM" value='TTTR' onClick='toggleLayer(TTTR_PM);' >Truck Travel Time Reliability</label>
+                          </div>
+
+
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+</div> 
+
+<script>
+var TTI, PTI, TSCORE, LRP_VC, CTN, TRANSIT,CRASH1,CRASH2, TTTI,Env,InfEmerg, PlanCntr, LOTTR, PHED, TTTR, all;
+var info = document.getElementById('selectedFeatures');
+var layer;
+function toggleLayer(e){
+  //  console.log(e);
+    var layer = e.value;
+    map.setLayoutProperty('TTI', 'visibility', 'none');
+    map.setLayoutProperty('LRP_VC', 'visibility', 'none');
+    map.setLayoutProperty('TSCORE', 'visibility', 'none');
+    map.setLayoutProperty('PTI', 'visibility', 'none');
+    map.setLayoutProperty('CTN','visibility', 'none');
+    map.setLayoutProperty('TRANSIT','visibility', 'none');
+    map.setLayoutProperty('CRASH1','visibility', 'none');
+    map.setLayoutProperty('CRASH2','visibility', 'none');
+    map.setLayoutProperty('TTTI','visibility', 'none');
+    map.setLayoutProperty('HvyTran','visibility', 'none');
+    map.setLayoutProperty('HHDen','visibility', 'none');
+    map.setLayoutProperty('Env','visibility', 'none');
+    map.setLayoutProperty('InfEmerg','visibility', 'none');
+    map.setLayoutProperty('PlanCntr','visibility', 'none');
+    map.setLayoutProperty('LOTTR','visibility', 'none');
+    map.setLayoutProperty('PHED','visibility', 'none');
+    map.setLayoutProperty('TTTR','visibility', 'none');
+    //map.setLayoutProperty(layer,'visibility', 'visible');
+
+   // this_layer.setMap(map);
+
+   // shownLayer = this_layer;
+
+    if ( layer === 'none' ) {
+        info.innerHTML = '';
+        map.setLayoutProperty('TTI', 'visibility', 'none');
+        map.setLayoutProperty('LRP_VC', 'visibility', 'none');
+        map.setLayoutProperty('TSCORE', 'visibility', 'none');
+        map.setLayoutProperty('PTI', 'visibility', 'none');
+        map.setLayoutProperty('CTN','visibility', 'none');
+        map.setLayoutProperty('TRANSIT','visibility', 'none');
+        map.setLayoutProperty('CRASH1','visibility', 'none');
+        map.setLayoutProperty('CRASH2','visibility', 'none');
+        map.setLayoutProperty('TTTI','visibility', 'none');
+        map.setLayoutProperty('HvyTran','visibility', 'none');
+        map.setLayoutProperty('HHDen','visibility', 'none');
+        map.setLayoutProperty('Env','visibility', 'none');
+        map.setLayoutProperty('InfEmerg','visibility', 'none');
+        map.setLayoutProperty('PlanCntr','visibility', 'none');
+        map.setLayoutProperty('LOTTR','visibility', 'none');
+        map.setLayoutProperty('PHED','visibility', 'none');
+       map.setLayoutProperty('TTTR','visibility', 'none');
+    } else {
+       map.setLayoutProperty(layer,'visibility', 'visible');
+       return layer;
+    }
+
+};
+
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY3J2YW5wb2xsYXJkIiwiYSI6ImNqMHdvdnd5MTAwMWEycXBocm4zbXVjZm8ifQ.3zjbFccILu6mL7cOTtp40A';
+  
+    var map = new mapboxgl.Map({
+        container: 'map',
+      // style: 'mapbox://styles/mapbox/streets-v11',
+         style: 'mapbox://styles/mapbox/light-v10',
+    //  style:'mapbox://styles/mapbox/navigation-guidance-night-v4',
+       //       style:'mapbox://styles/crvanpollard/ck4edq5c250ra1cn0tl6qa96o',
+        center: [ -75.170669,39.950143], 
+        zoom: 9
+    });
+
+
+    map.on('load', function() {
+            var layers = map.getStyle().layers;
+            // Find the index of the first symbol layer in the map style
+            var firstSymbolId;
+            for (var i = 0; i < layers.length; i++) {
+            if (layers[i].type === 'symbol') {
+            firstSymbolId = layers[i].id;
+            break;
+            }
+            }
+
+      map.addLayer({
+          id: "TTI",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TTI+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "TTI"], .5],
+                    "#f5b041",
+                    ["==", ["get", "TTI"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "TTI"], .5],
+                    6,
+                    ["==", ["get", "TTI"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "TTI"], .5],
+                    .4,
+                    ["==", ["get", "TTI"], 1],
+                    .8,
+                    0
+                  ],
+          },
+              firstSymbolId
+      });
+
+      map.addLayer({
+          id: "LRP_VC",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=LRP_VC+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "LRP_VC"], .5],
+                    "#f5b041",
+                    ["==", ["get", "LRP_VC"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "LRP_VC"], .5],
+                    6,
+                    ["==", ["get", "LRP_VC"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "LRP_VC"], .5],
+                    .4,
+                    ["==", ["get", "LRP_VC"], 1],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+     map.addLayer({
+          id: "TSCORE",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TransScore>+0+or+RailPoint+>+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    [
+                    "any",
+                    ["==", ["get", "TransScore"], .5],
+                    ["==", ["get", "RailPoint"], .5]
+                 //   "==", ["get", "RailPoint"], .5
+                    ],
+                    "#f5b041",
+                    [
+                     "any",
+                    ["==", ["get", "TransScore"], 1],
+                    ["==", ["get", "RailPoint"], 1]
+                    ],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["any",["==", ["get", "TransScore"], .5],["==", ["get", "RailPoint"], .5]],
+                    6,
+                    ["any",["==", ["get", "TransScore"], 1],["==", ["get", "RailPoint"], 1]],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                  ["any",["==", ["get", "TransScore"], .5],["==", ["get", "RailPoint"], .5]],
+                    .4,
+                  ["any",["==", ["get", "TransScore"], 1],["==", ["get", "RailPoint"], 1]],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+   map.addLayer({
+          id: "PTI",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=PTI+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=pgeojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "PTI"], .5],
+                    "#f5b041",
+                    ["==", ["get", "PTI"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "PTI"], .5],
+                    6,
+                    ["==", ["get", "PTI"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "PTI"], .5],
+                    .4,
+                    ["==", ["get", "PTI"], 1],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+
+     map.addLayer({
+          id: "CTN",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=NHSPoint%3E+0+or+TransitPoi+%3E+0+or+RailLinePo+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    [
+                    "any",
+                    ["==", ["get", "NHSPoint"], 0],
+                    ["==", ["get", "FreightPo"], .5],
+                    ["==", ["get", "RailLinePo"], .5]
+                    ],
+                    "#f5b041",
+                    [
+                     "any",
+                    ["==", ["get", "NHSPoint"], .5],
+                    ["==", ["get", "FreightPo"], 1],
+                    ["==", ["get", "RailLinePo"], 1]
+                    ],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["any",["==", ["get", "NHSPoint"], .0],["==", ["get", "FreightPo"], .5],["==", ["get", "RailLinePo"], .5]],
+                    6,
+                    ["any",["==", ["get", "NHSPoint"], .5],["==", ["get", "FreightPo"], 1],["==", ["get", "RailLinePo"], 1]],
+                    2,
+                    0
+                  ],
+              "line-opacity":
+                  [
+                  "case",
+                  ["any",["==", ["get", "NHSPoint"], .0],["==", ["get", "FreightPo"], .5]],
+                    .4,
+                  ["any",["==", ["get", "NHSPoint"], .5],["==", ["get", "FreightPo"], 1],["==", ["get", "RailLinePo"], 1]],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+      map.addLayer({
+          id: "TRANSIT",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TransitPoi+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "TransitPoi"], .5],
+                    "#f5b041",
+                    ["==", ["get", "TransitPoi"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "TransitPoi"], .5],
+                    6,
+                    ["==", ["get", "TransitPoi"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "TransitPoi"], .5],
+                    .4,
+                    ["==", ["get", "TransitPoi"], 1],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+      map.addLayer({
+          id: "CRASH1",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=HighCrSev+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "HighCrSev"], 0],
+                    "#f5b041",
+                    ["==", ["get", "HighCrSev"], .5],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "HighCrSev"], 0],
+                    6,
+                    ["==", ["get", "HighCrSev"], .5],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "HighCrSev"], 0],
+                    .4,
+                    ["==", ["get", "HighCrSev"], .5],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+      map.addLayer({
+          id: "CRASH2",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=HighCrFreq+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "HighCrFreq"], 0],
+                    "#f5b041",
+                    ["==", ["get", "HighCrFreq"], .5],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "HighCrFreq"], 0],
+                    6,
+                    ["==", ["get", "HighCrFreq"], .5],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "HighCrFreq"], 0],
+                    .4,
+                    ["==", ["get", "HighCrFreq"], .5],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+     map.addLayer({
+          id: "TTTI",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TTTI+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "TTTI"], .5],
+                    "#f5b041",
+                    ["==", ["get", "TTTI"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "TTTI"], .5],
+                    6,
+                    ["==", ["get", "TTTI"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "TTTI"], .5],
+                    .4,
+                    ["==", ["get", "TTTI"], 1],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+       map.addLayer({
+          id: "HvyTran",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=HvyTran+%3E+0+OR+Limerick+%3E+0+OR+MajBridge+%3E+0+OR+Bridges+%3E+0+OR+Military+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    [
+                    "any",
+                    ["==", ["get", "HvyTran"], 0],
+                    ["==", ["get", "Limerick"], 0],
+                    ["==", ["get", "Bridges"], 0],
+                    ["==", ["get", "Military"], 0],
+                    ["==", ["get", "MajBridge"], 0]
+                    ],
+                    "#f5b041",
+                    [
+                     "any",
+                    ["==", ["get", "HvyTran"], .50],
+                    ["==", ["get", "Limerick"], .50],
+                    ["==", ["get", "Bridges"], .50],
+                    ["==", ["get", "Military"], .50],
+                    ["==", ["get", "MajBridge"], .50]
+                    ],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    [
+                     "any",
+                    ["==", ["get", "HvyTran"], 0],
+                    ["==", ["get", "Limerick"], 0],
+                    ["==", ["get", "Bridges"], 0],
+                    ["==", ["get", "Military"], 0],
+                    ["==", ["get", "MajBridge"], 0]
+                    ],
+                    6,
+                    [
+                     "any",
+                    ["==", ["get", "HvyTran"], .50],
+                    ["==", ["get", "Limerick"], .50],
+                    ["==", ["get", "Bridges"], .50],
+                    ["==", ["get", "Military"], .50],
+                    ["==", ["get", "MajBridge"], .50]
+                    ],
+                    2,
+                    0
+                  ],
+              "line-opacity":
+                  [
+                  "case",
+                [
+                     "any",
+                    ["==", ["get", "HvyTran"], 0],
+                    ["==", ["get", "Limerick"], 0],
+                    ["==", ["get", "Bridges"], 0],
+                    ["==", ["get", "Military"], 0],
+                    ["==", ["get", "MajBridge"], 0]
+                    ],
+                    .4,
+                  [
+                     "any",
+                    ["==", ["get", "HvyTran"], .50],
+                    ["==", ["get", "Limerick"], .50],
+                    ["==", ["get", "Bridges"], .50],
+                    ["==", ["get", "Military"], .50],
+                    ["==", ["get", "MajBridge"], .50]
+                    ],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+      map.addLayer({
+          id: "HHDen",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=HHDen+%3E+0+OR+EmpDen+%3E+0+OR+StadGathr+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    [
+                    "any",
+                    ["==", ["get", "HHDen"], 1],
+                    ["==", ["get", "EmpDen"], 1],
+                    ["==", ["get", "StadGathr"], 1]
+                    ],
+                    "#f5b041",
+                    [
+                     "any",
+                    ["==", ["get", "HHDen"], .5],
+                    ["==", ["get", "EmpDen"], .5],
+                    ["==", ["get", "StadGathr"], .5]
+                    ],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    [
+                     "any",
+                    ["==", ["get", "HHDen"], 1],
+                    ["==", ["get", "EmpDen"], 1],
+                    ["==", ["get", "StadGathr"], 1]
+                    ],
+                    2,
+                    [
+                     "any",
+                    ["==", ["get", "HHDen"], .5],
+                    ["==", ["get", "EmpDen"], .5],
+                    ["==", ["get", "StadGathr"], .5]
+                    ],
+                    2,
+                    0
+                  ],
+              "line-opacity":
+                  [
+                  "case",
+                [
+                     "any",
+                    ["==", ["get", "HHDen"], 1],
+                    ["==", ["get", "EmpDen"], 1],
+                    ["==", ["get", "StadGathr"], 1]
+                    ],
+                    .8,
+                  [
+                     "any",
+                    ["==", ["get", "HHDen"], .5],
+                    ["==", ["get", "EmpDen"], .5],
+                    ["==", ["get", "StadGathr"], .5]
+                    ],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+ map.addLayer({
+          id: "Env",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=ENV+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "Env"], 0],
+                    "#f5b041",
+                    ["==", ["get", "Env"], .5],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "Env"], 0],
+                    6,
+                    ["==", ["get", "Env"], .5],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "Env"], 0],
+                    .4,
+                    ["==", ["get", "Env"], .5],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+    map.addLayer({
+          id: "InfEmerg",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=InfEmerg+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "InfEmerg"], 0],
+                    "#f5b041",
+                    ["==", ["get", "InfEmerg"], .5],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "InfEmerg"], 0],
+                    6,
+                    ["==", ["get", "InfEmerg"], .5],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "InfEmerg"], 0],
+                    .4,
+                    ["==", ["get", "InfEmerg"], .5],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+    map.addLayer({
+          id: "PlanCntr",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=PlanCntr+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "PlanCntr"], 0],
+                    "#f5b041",
+                    ["==", ["get", "PlanCntr"], .5],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "PlanCntr"], 0],
+                    6,
+                    ["==", ["get", "PlanCntr"], .5],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "PlanCntr"], 0],
+                    .4,
+                    ["==", ["get", "PlanCntr"], .5],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+ map.addLayer({
+          id: "LOTTR",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=LOTTR+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "LOTTR"], .5],
+                    "#f5b041",
+                    ["==", ["get", "LOTTR"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "LOTTR"], .5],
+                    6,
+                    ["==", ["get", "LOTTR"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "LOTTR"], .5],
+                    .4,
+                    ["==", ["get", "LOTTR"], 1],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+map.addLayer({
+          id: "PHED",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=PHED+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "PHED"], .5],
+                    "#f5b041",
+                    ["==", ["get", "PHED"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "PHED"], .5],
+                    6,
+                    ["==", ["get", "PHED"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "PHED"], .5],
+                    .4,
+                    ["==", ["get", "PHED"], 1],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+map.addLayer({
+          id: "TTTR",
+          type: "line",
+          source: {
+              "type": "geojson",
+              "data":"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CMP_CriteriaNetwork/FeatureServer/0/query?where=TTTR+%3E+0&outFields=*&returnGeometry=true&geometryPrecision=8&outSR=4326&f=geojson"
+          },
+          layout: {
+              "visibility":"none",
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          paint: {
+             "line-color":
+                  [
+                  "case",
+                    ["==", ["get", "TTTR"], .5],
+                    "#f5b041",
+                    ["==", ["get", "TTTR"], 1],
+                    "#cb4335",
+                    "#cccccc"
+                  ],
+              "line-width":
+                  [
+                  "case",
+                    ["==", ["get", "TTTR"], .5],
+                    6,
+                    ["==", ["get", "TTTR"], 1],
+                    2,
+                    0
+                  ],
+                     "line-opacity":
+                  [
+                  "case",
+                    ["==", ["get", "TTTR"], .5],
+                    .4,
+                    ["==", ["get", "TTTR"], 1],
+                    .8,
+                    0
+                  ],
+          }
+      });
+
+
+
+      map.on('click', function (e) {
+          var bbox = [[e.point.x - 5, e.point.y - 5],[e.point.x + 5, e.point.y + 5]];
+          var features = map.queryRenderedFeatures(bbox, {layers: ['TTI','LRP_VC','TSCORE','PTI','CTN','TRANSIT', 'CRASH1', 'CRASH2','TTTI', 'HvyTran', 'HHDen', 'Env', 'InfEmerg', 'PlanCntr', 'LOTTR', 'PHED', 'TTTR']});
+
+            if (!features.length) {
+              //  console.log(e.lngLat);
+          //    let numbers = e.lngLat;
+         //     numbers = JSON.parse(numbers);
+        //    alert(numbers);
+           //  alert (e.lngLat);
+              return;
+            }
+
+            var content = '';
+
+            for(var i = 0; i<features.length; i++) {
+              var roadname = features[i].properties.RoadName
+              var dir = features[i].properties.Bearing
+              var tti = features[i].properties.TTI
+              var vc = features[i].properties.LRP_VC
+              var transcore = features[i].properties.TransScore
+              var rail = features[i].properties.RailPoint
+              var pti = features[i].properties.PTI
+              var nhs = features[i].properties.NHSPoint
+              var transit = features[i].properties.TransitPoi 
+              var crash1 = features[i].properties.HighCrSev
+              var crash2 = features[i].properties.HighCrFreq
+              var ttti = features[i].properties.TTTI
+              var security = features[i].properties.HvyTran
+              var evac = features[i].properties.HHDen
+              var green = features[i].properties.Env
+              var infill = features[i].properties.InfEmerg
+              var landuse = features[i].properties.PlanCntr
+              var lottr = features[i].properties.LOTTR
+              var phed = features[i].properties.PHED
+              var tttr = features[i].properties.TTTR
+         
+              var newSet = '<div id="pm_info"><h3 style="background-color:#E0E0E0"><i class="glyphicon glyphicon-stats"></i>&nbsp; Performance Measures</h3>The scores below are for the selected roadway segments<br>' +
+                          '<B>Road Name:</B> ' + roadname + 
+                          '<br><B>Direction:</B> ' + dir + 
+                    //      '<br><a href="https://maps.google.com/maps?q=&layer=c&cbll=' + lat + ', ' + lng +'&cbp=" target="_new">Launch Google Streetview near this location</a><br>'+
+                          '<table id="crashtable">' +
+                          '<tbody>' +
+                          '<tr class="odd">' +
+                          '<th>Travel Time Index (TTI)</th><td>' + tti + '</td>' +
+                          '<tr class="even">' +
+                          '<th>Anticipated Growth in V/C</th><td>' + vc + '</td>' +
+                          '<tr class="odd">' +
+                         '<th>Transit Score and Rail Stations</th><td>' + transcore + ' & '+ rail+ '</td>' +
+                          '<tr class="even">' +
+                          '<th>Planning Time Index (PTI)</th><td>' + pti+ '</td>' +
+                          '<tr class="odd">' +
+                          '<th>Core Transportation Network</th><td>' + nhs + '</td>' +
+                          '<tr class="even">' +
+                          '<th>Existing Transit</th><td>' + transit + '</td>' +
+                          '<tr class="odd">' +
+                          '<th>High Crash Severity</th><td>' + crash1 + '</td>' +
+                          '<tr class="even">' +
+                          '<th>High Crash Frequency</th><td>' + crash2 + '</td>' +
+                           '<tr class="odd">' +
+                          '<th>Truck Travel Time Index </th><td>' + ttti + '</td>' +
+                          '<tr class="even">' +
+                          '<th>Transportation Security</th><td>' + security + '</td>' +
+                          '<tr class="odd">' +
+                          '<th>Areas of Special Evacuation Concern</th><td>' + evac + '</td>' +
+                          '<tr class="even">' +
+                          '<th>Low Green Infrastructure Screening Score</th><td>' + green + '</td>' +
+                          '<tr class="odd">' +
+                          '<th>Connections 2045 Infill, Redevelopment and Emerging Growth</th><td>' + infill + '</td>' +
+                          '<tr class="even">' +
+                          '<th>Connections 2045 Land Use Centers</th><td>' + landuse + '</td>' +
+                          '<tr class="odd">' +
+                          '<th>Level of Travel Time Reliability </th><td>' + lottr + '</td>' +
+                          '<tr class="even">' +
+                          '<th>Peak Hour Excessive Delay</th><td>' + phed + '</td>' +
+                          '<tr class="odd">' +
+                          '<th>Truck Travel Time Reliability</th><td>' + tttr + '</td>' + 
+                          '</tbody>' +
+                          '<table>';
+              content += newSet
+            }
+
+            info.innerHTML = content;
+      });
+
+    });
+
+</script>
+
+</body>
+</html>
