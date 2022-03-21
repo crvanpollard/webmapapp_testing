@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <title>Mapbox Highlight with FeatureState</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <!-- <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' /> -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/2.7.0/mapbox-gl.js' integrity='sha512-0LAYmZE4t4F2VwEekJH7xke7ptQRr4yF7w4bXC1ywmUOkHG9ucQGLuLhQIF3jAd/kQDcKcv5epfyOfjUW5XSow==' crossorigin='anonymous'></script>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/2.7.0/mapbox-gl.css' integrity='sha512-5fX4Hy2/CjCjezt8kPbPtdjCmJZVVqD5t2ibWR4Z7CUVrhYHs1Dnni8yVXks9ZzIMcyPRo1c6wBfkeo5GhblFw==' crossorigin='anonymous'/>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js' integrity='sha512-Q7HOppxoH0L2M7hreVoFCtUZimR2YaY0fBewIYzkCgmNtgOOZ5IgMNYxHgfps0qrO1ef5m7L1FeHrhXlq1I9HA==' crossorigin='anonymous'></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map" class="map"></div>
+  <script>
+    //https://docs.mapbox.com/help/troubleshooting/mapbox-gl-js-performance/
+    /*Blank Mapbox GL Map*/
+    var map = new mapboxgl.Map({
+      container: 'map',
+      hash: true,
+      /*style: 'some mapbox style url*/
+      /*below is a blank style*/
+      style: {
+        "version": 8,
+        "name": "blank",
+        "sources": {
+          "blank": {
+            "type": "vector",
+            "url": ""
+          }
+        },
+        "layers": [{
+          "id": "background",
+          "type": "background",
+          "paint": {
+            "background-color": "#121212",
+            "background-opacity": 0.9
+          }
+        }]
+      },
+      // center: [-95.52, 39.94],
+      center: [
+        -81.96147239565644,
+        39.9612564769845
+        ],
+      zoom: 15,
+      scrollZoom: false
+    });
+    // map.addControl(new mapboxgl.NavigationControl());
+    // map.addControl(new mapboxgl.FullscreenControl());
+
+    /*End Blank Map*/
+
+    /*Add Layers*/
+    /*Wait for the initial style to load*/
+
+    var idField = "id"
+
+    map.on('style.load', function () {
+      // map.addSource('counties', {
+      //   'type': 'geojson',
+      //   'data': 'https://ovrdc.github.io/gis-tutorials/tutorial-data/counties.geojson',
+      //   'generateId': true
+      // });
+
+      map.addSource('counties', {
+        "type": "vector",
+        "tiles": ["https://311.coz.org/api/v1/vector-tiles/public.adm_mus_parcels/{z}/{x}/{y}.pbf"],
+        maxzoom: 22
+      })
+
+
+      map.addLayer({
+        'id': 'countiesLayer',
+        'type': 'fill',
+        'source': 'counties',
+        'source-layer': 'public.adm_mus_parcels',
+        'layout': {
+          'visibility': 'visible'
+        },
+        'paint': {
+          'fill-color': 'transparent',
+          'fill-outline-color': 'white',
+          'fill-opacity': 0.9
+        }
+      });
+
+    });
+
+    function highlightFeatureWithFilter(e) {
+      // console.log("filter")
+      var features = map.queryRenderedFeatures(e.point);
+
+      var style = map.getStyle().layers;
+      var layers = style.reduce((i,l) => {
+        return [...i, l.id]
+      }, [])
+
+      if (features.length < 1) {
+        if (layers.indexOf("highlight") > -1) {
+          map.setFilter("highlight", ["==", idField, "9999"])
+        }
+        return
+      }
+
+      if (layers.indexOf("highlight") > -1) {
+        map.setFilter("highlight", ["==", idField, features[0].properties.ID])
+        return
+      }
+
+      var layer = features[0].layer;
+      layer.id = "highlight";
+      layer.filter = ["==", idField, features[0].properties.ID]
+      layer.type = "line";
+      layer.paint = {
+        "line-color": "red",
+        "line-width": 4
+      }
+
+      map.addLayer(layer)
+
+    }
+
+    var highlightId = 99999999;
+
+    function highlightFeatureWithFeatureState(e) {
+      console.log("featureState")
+      var features = map.queryRenderedFeatures(e.point);
+      var style = map.getStyle().layers;
+      var layers = style.reduce((i,l) => {
+        return [...i, l.id]
+      }, [])
+      // console.log(features[0])
+      if (features.length < 1) {
+        if (layers.indexOf("highlightFeatureState") > -1) {
+          map.setFeatureState({source: "counties", id: highlightId, sourceLayer: 'public.adm_mus_parcels'}, {highlight: false})
+        }
+        return
+      }
+
+      if (layers.indexOf("highlightFeatureState") > -1) {
+        map.setFeatureState({source: features[0].layer.source, sourceLayer: 'public.adm_mus_parcels', id: highlightId}, {highlight: false})
+        highlightId = features[0].id
+        map.setFeatureState({source: features[0].layer.source, sourceLayer: 'public.adm_mus_parcels',id: highlightId}, {highlight: true});
+        return
+      }
+
+      var layer = features[0].layer;
+      layer.id = "highlightFeatureState";
+      layer.type = "line";
+      layer.paint = {
+        "line-color": ["case",
+          ["boolean", ["feature-state", "highlight"], false],
+          "red",
+          "transparent"
+        ],
+        "line-width": 4
+      }
+      layer.layout["visibility"] = "visible"
+      console.log(layer)
+      if (!layers.includes("highlightFeatureState")) map.addLayer(layer);
+      highlightId = features[0].id;
+      map.setFeatureState({source: features[0].layer.source, sourceLayer: 'public.adm_mus_parcels',id: highlightId}, {highlight: true});
+      
+    }
+
+    var highlighted = false;
+
+    function highlightAllFeatures(e) {
+      console.log("featureStateAll")
+
+      var style = map.getStyle().layers;
+      var layers = style.reduce((i,l) => {
+        return [...i, l.id]
+      }, [])
+
+      var features = map.queryRenderedFeatures();
+      console.log(features.length);
+
+      var ids = ["in", "id"];
+      if (features.length) {
+        for (let i = 0; i < 50000; i++) {
+          ids.push(features[i].id)
+        }
+      }
+
+      if (highlighted) {
+        features.forEach(f => {
+          map.setFeatureState({source: f.layer.source, sourceLayer: 'public.adm_mus_parcels',id: f.id}, {highlight: false})
+        });
+        highlighted = false;
+        return
+      }
+
+      if (layers.includes("highlightFeatureState")) {
+        features.forEach(f => {
+          map.setFeatureState({source: f.layer.source, sourceLayer: 'public.adm_mus_parcels',id: f.id}, {highlight: true});
+        });
+        highlighted = true
+      }else{
+        features.forEach(f => {
+          map.setFeatureState({source: f.layer.source, sourceLayer: 'public.adm_mus_parcels',id: f.id}, {highlight: true});
+        });
+        highlighted = true; 
+        var layer = features[0].layer;
+        layer.id = "highlightFeatureState";
+        layer.type = "line";
+        layer.paint = {
+          "line-color": ["case",
+            ["boolean", ["feature-state", "highlight"], false],
+            "red",
+            "transparent"
+          ],
+          "line-width": 4
+        }
+        layer.layout["visibility"] = "visible"
+        map.addLayer(layer);  
+
+      }
+   
+    }
+
+    map.on('click', highlightFeatureWithFeatureState);
+
+    map.on('mousemove', highlightFeatureWithFeatureState);
+
+    map.on('contextmenu', highlightAllFeatures);
+
+    var start = Date.now()
+    var now = Date.now();
+    var then = Date.now();
+    var seconds = 0;
+
+    var timerStart, timerStarted;
+    var seconds = 0;
+    map.on('render', function() {
+      if (map.loaded()) {
+        if (timerStarted) {
+          var timerEnd = Date.now(); 
+          console.log(timerEnd - timerStart);
+          timerStarted = false;
+        }
+        return 
+      }
+      mapCheckLoaded(map);
+      if (!timerStarted) {
+        console.log("timer starting")
+        timerStarted = true;
+        timerStart = Date.now();
+      }
+    });
+
+    function mapCheckLoaded(map) {
+      if (!map.loaded()) {
+        return 
+      }
+      map.off('render', mapCheckLoaded);
+    }
+
+    map.on("click", function() {
+      seconds = 0;
+      timerStart = 0;
+      console.log("timer cleared", timerStart)
+    })
+
+  </script>
+</body>
+
+</html>
