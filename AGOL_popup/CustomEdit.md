@@ -7,7 +7,9 @@ https://dvrpcgis.maps.arcgis.com/apps/mapviewer/index.html?webmap=f43b6241f15a45
 
 ### Step 1
 Open the Pop-ups properties window
-![](./img/popups1.png){ width="500" }
+
+![webmap](./img/popups1.png){width="500"}
+
 ### Step 2
 Next select the "edit text" option in the Text section
 ### Step 3
