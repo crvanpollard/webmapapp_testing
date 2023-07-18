@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <title>Mapbox Highlight with Filter</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map" class="map"></div>
+  <script>
+    //https://docs.mapbox.com/help/troubleshooting/mapbox-gl-js-performance/
+    /*Blank Mapbox GL Map*/
+//1d1f20
+    var map = new mapboxgl.Map({
+      container: 'map',
+      hash: true,
+      /*style: 'some mapbox style url*/
+      /*below is a blank style*/
+      style: {
+        "version": 8,
+        "name": "blank",
+        "sources": {
+          "openmaptiles": {
+            "type": "vector",
+            "url": ""
+          }
+        },
+        "layers": [{
+          "id": "background",
+          "type": "background",
+          "paint": {
+            "background-color": "whitesmoke"
+          }
+        }]
+      },
+      center: [-95.52, 39.94],
+      zoom: 5,
+      scrollZoom: false
+    });
+    // map.addControl(new mapboxgl.NavigationControl());
+    // map.addControl(new mapboxgl.FullscreenControl());
+
+    /*End Blank Map*/
+
+    /*Add Layers*/
+    /*Wait for the initial style to load*/
+
+    map.on('style.load', function () {
+      map.addSource('counties', {
+        'type': 'geojson',
+        'data': 'https://ovrdc.github.io/gis-tutorials/tutorial-data/counties.geojson',
+        'generateId': true
+      });
+
+
+      map.addLayer({
+        'id': 'countiesLayer',
+        'type': 'fill',
+        'source': 'counties',
+        'layout': {
+          'visibility': 'visible'
+        },
+        'paint': {
+          'fill-color': 'transparent',
+          'fill-outline-color': '#121212',
+          'fill-opacity': 0.9
+        }
+      });
+    });
+
+    function highlightFeatureWithFilter(e) {
+      console.log("filter")
+      var features = map.queryRenderedFeatures(e.point);
+
+      var style = map.getStyle().layers;
+      var layers = style.reduce((i,l) => {
+        return [...i, l.id]
+      }, [])
+
+      if (features.length < 1) {
+        if (layers.indexOf("highlight") > -1) {
+          map.setFilter("highlight", ["==", "FIPS", "9999"])
+        }
+        return
+      }
+
+      if (layers.indexOf("highlight") > -1) {
+        map.setFilter("highlight", ["==", "FIPS", features[0].properties.FIPS])
+        return
+      }
+
+      var layer = features[0].layer;
+      layer.id = "highlight";
+      layer.filter = ["==", "FIPS", features[0].properties.FIPS]
+      layer.type = "line";
+      layer.paint = {
+        "line-color": "red",
+        "line-width": 4
+      }
+
+      map.addLayer(layer)
+
+    }
+
+    var highlightId = 99999999;
+
+    function highlightFeatureWithFeatureState(e) {
+      console.log("featureState")
+      var features = map.queryRenderedFeatures(e.point);
+      var style = map.getStyle().layers;
+      var layers = style.reduce((i,l) => {
+        return [...i, l.id]
+      }, [])
+
+      if (features.length < 1) {
+        if (layers.indexOf("highlightFeatureState") > -1) {
+          map.setFeatureState({source: "counties", id: highlightId}, {highlight: false})
+        }
+        return
+      }
+
+      if (layers.indexOf("highlightFeatureState") > -1) {
+        map.setFeatureState({source: features[0].layer.source, id: highlightId}, {highlight: false})
+        highlightId = features[0].id
+        map.setFeatureState({source: features[0].layer.source, id: highlightId}, {highlight: true});
+        return
+      }
+
+      var layer = features[0].layer;
+      layer.id = "highlightFeatureState";
+      layer.type = "line";
+      layer.paint = {
+        "line-color": ["case",
+          ["boolean", ["feature-state", "highlight"], false],
+          "red",
+          "transparent"
+        ],
+        "line-width": 4
+      }
+
+      map.addLayer(layer);
+      highlightId = features[0].id;
+      map.setFeatureState({source: features[0].layer.source, id: highlightId}, {highlight: true});
+      
+
+    }
+
+    map.on('click', highlightFeatureWithFilter);
+
+    map.on('mousemove', highlightFeatureWithFilter);
+
+    var start = Date.now()
+    var now = Date.now();
+    var then = Date.now();
+    var seconds = 0;
+
+    var timerStart, timerStarted;
+    var seconds = 0;
+    map.on('render', function() {
+      if (map.loaded()) {
+        if (timerStarted) {
+          var timerEnd = Date.now(); 
+          console.log(timerEnd - timerStart);
+          timerStarted = false;
+        }
+        return 
+      }
+      mapCheckLoaded(map);
+      if (!timerStarted) {
+        console.log("timer starting")
+        timerStarted = true;
+        timerStart = Date.now();
+      }
+    });
+
+    function mapCheckLoaded(map) {
+      if (!map.loaded()) {
+        return 
+      }
+      map.off('render', mapCheckLoaded);
+    }
+
+    map.on("click", function() {
+      seconds = 0;
+      timerStart = 0;
+      console.log("timer cleared", timerStart)
+    })
+
+  </script>
+</body>
+
+</html>
