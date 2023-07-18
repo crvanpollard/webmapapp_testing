@@ -59,7 +59,7 @@ var tiles = {
 
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/light-v9',
+    style: 'mapbox://styles/mapbox/light-v11',
     attributionControl: false,
     center: [-75.2273, 40.071],
     zoom: 8.5
@@ -113,7 +113,7 @@ break;
     'paint': {
         'fill-opacity': 1
     }
-  }, "landcover_crop")
+  }, "waterway")
 
   map.addLayer({
     'id': 'municipality-outline',
