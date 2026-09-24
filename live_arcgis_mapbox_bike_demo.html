@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bike Facility Accessibility Demo</title>
+ 
+https://api.mapbox.com/mapbox-gl-js/v3.5.0/mapbox-gl.css
+ 
+<style>
+ 
+html,
+body{
+margin:0;
+padding:0;
+height:100%;
+font-family:Arial,Helvetica,sans-serif;
+}
+ 
+header{
+background:#1f2937;
+color:white;
+padding:12px 16px;
+}
+ 
+header h2{
+margin:0;
+}
+ 
+header p{
+margin:6px 0 0 0;
+opacity:.85;
+}
+ 
+#maps{
+display:grid;
+grid-template-columns:1fr 1fr;
+height:85vh;
+}
+ 
+.map-panel{
+display:flex;
+flex-direction:column;
+min-width:0;
+}
+ 
+.panel-title{
+padding:10px;
+text-align:center;
+font-weight:700;
+background:#f3f4f6;
+border-bottom:1px solid #d1d5db;
+}
+ 
+.dark-title{
+background:#111827;
+color:white;
+}
+ 
+.map{
+flex:1;
+min-height:500px;
+}
+ 
+.panel-legend{
+padding:14px;
+}
+ 
+.light-legend{
+background:#FCFCFD;
+color:#222;
+border-top:1px solid #d1d5db;
+}
+ 
+.dark-legend{
+background:#101010;
+color:white;
+border-top:1px solid #444;
+}
+ 
+.legend-item{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:8px;
+font-size:14px;
+}
+ 
+.legend-item svg{
+flex-shrink:0;
+}
+ 
+.panel-legend h4{
+margin:0 0 12px 0;
+}
+ 
+@media (max-width:900px){
+ 
+#maps{
+grid-template-columns:1fr;
+height:auto;
+}
+ 
+.map{
+height:450px;
+}
+ 
+}
+ 
+</style>
+</head>
+<body>
+ 
+<header>
+<h2>Bike Facility Accessibility Demonstration</h2>
+<p>
+Live ArcGIS FeatureServer rendered on synchronized
+Mapbox Light and Mapbox Dark basemaps.
+</p>
+</header>
+ 
+<div id="maps">
+ 
+<!-- LIGHT -->
+ 
+<div class="map-panel">
+ 
+<div class="panel-title">
+Mapbox Light
+</div>
+ 
+<div id="light" class="map"></div>
+ 
+<div class="panel-legend light-legend">
+ 
+<h4>Facility Symbology</h4>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#D95F4E"
+stroke-width="4"/>
+</svg>
+<span>Conventional Bike Lanes</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#4C78A8"
+stroke-width="4"
+stroke-dasharray="8 4"/>
+</svg>
+<span>Sharrows</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="8" x2="90" y2="8"
+stroke="#5E9C36"
+stroke-width="3"/>
+<line x1="10" y1="16" x2="90" y2="16"
+stroke="#5E9C36"
+stroke-width="3"/>
+</svg>
+<span>Buffered Bike Lanes</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#C97A00"
+stroke-width="3"
+stroke-dasharray="3 3"/>
+</svg>
+<span>Painted Shoulders</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#8E5EA2"
+stroke-width="8"/>
+</svg>
+<span>Parking Protected Bike Lanes</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#B59F00"
+stroke-width="8"/>
+</svg>
+<span>Protected Bike Lanes</span>
+</div>
+ 
+</div>
+ 
+</div>
+ 
+<!-- DARK -->
+ 
+<div class="map-panel">
+ 
+<div class="panel-title dark-title">
+Mapbox Dark
+</div>
+ 
+<div id="dark" class="map"></div>
+ 
+<div class="panel-legend dark-legend">
+ 
+<h4>Facility Symbology</h4>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#D95F4E"
+stroke-width="4"/>
+</svg>
+<span>Conventional Bike Lanes</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#4C78A8"
+stroke-width="4"
+stroke-dasharray="8 4"/>
+</svg>
+<span>Sharrows</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="8" x2="90" y2="8"
+stroke="#5E9C36"
+stroke-width="3"/>
+<line x1="10" y1="16" x2="90" y2="16"
+stroke="#5E9C36"
+stroke-width="3"/>
+</svg>
+<span>Buffered Bike Lanes</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#C97A00"
+stroke-width="3"
+stroke-dasharray="3 3"/>
+</svg>
+<span>Painted Shoulders</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#8E5EA2"
+stroke-width="8"/>
+</svg>
+<span>Parking Protected Bike Lanes</span>
+</div>
+ 
+<div class="legend-item">
+<svg width="100" height="24">
+<line x1="10" y1="12" x2="90" y2="12"
+stroke="#B59F00"
+stroke-width="8"/>
+</svg>
+<span>Protected Bike Lanes</span>
+</div>
+ 
+</div>
+ 
+</div>
+ 
+</div>
+ 
+https://api.mapbox.com/mapbox-gl-js/v3.5.0/mapbox-gl.jsscript>
+ 
+<script>
+ 
+mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN";
+ 
+const DATA_URL =
+"https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/Complete_Streets_Resurfacing_Finished_Segments/FeatureServer/0/query?where=1%3D1&returnGeometry=true&outFields=*&f=pgeojson";
+ 
+let sharedData = null;
+ 
+function syncMaps(mapA,mapB){
+ 
+let syncing = false;
+ 
+function move(source,target){
+ 
+if(syncing) return;
+ 
+syncing = true;
+ 
+target.jumpTo({
+center:source.getCenter(),
+zoom:source.getZoom(),
+pitch:source.getPitch(),
+bearing:source.getBearing()
+});
+ 
+syncing = false;
+}
+ 
+mapA.on("move",()=>move(mapA,mapB));
+mapB.on("move",()=>move(mapB,mapA));
+}
+ 
+async function loadData(){
+ 
+if(sharedData) return sharedData;
+ 
+const response = await fetch(DATA_URL);
+sharedData = await response.json();
+ 
+return sharedData;
+}
+ 
+function getBounds(data){
+ 
+const bounds = new mapboxgl.LngLatBounds();
+ 
+data.features.forEach(f=>{
+ 
+const g = f.geometry;
+ 
+if(!g) return;
+ 
+if(g.type==="LineString"){
+ 
+g.coordinates.forEach(c=>bounds.extend(c));
+ 
+}else if(g.type==="MultiLineString"){
+ 
+g.coordinates.forEach(line=>{
+line.forEach(c=>bounds.extend(c));
+});
+ 
+}
+ 
+});
+ 
+return bounds;
+}
+ 
+async function addBikeLayers(map,sourceName){
+ 
+const data = await loadData();
+ 
+map.addSource(sourceName,{
+type:"geojson",
+data:data
+});
+ 
+map.addLayer({
+id:`${sourceName}-conventional`,
+type:"line",
+source:sourceName,
+filter:["==",["get","Feat"],"Conventional bike lanes"],
+paint:{
+"line-color":"#D95F4E",
+"line-width":4
+}
+});
+ 
+map.addLayer({
+id:`${sourceName}-sharrows`,
+type:"line",
+source:sourceName,
+filter:["==",["get","Feat"],"Sharrows"],
+paint:{
+"line-color":"#4C78A8",
+"line-width":4,
+"line-dasharray":[2,1]
+}
+});
+ 
+map.addLayer({
+id:`${sourceName}-buffered-casing`,
+type:"line",
+source:sourceName,
+filter:["==",["get","Feat"],"Buffered bike lanes"],
+paint:{
+"line-color":"#5E9C36",
+"line-width":10
+}
+});
+ 
+map.addLayer({
+id:`${sourceName}-buffered-center`,
+type:"line",
+source:sourceName,
+filter:["==",["get","Feat"],"Buffered bike lanes"],
+paint:{
+"line-color":"#FFFFFF",
+"line-width":4
+}
+});
+ 
+map.addLayer({
+id:`${sourceName}-shoulder`,
+type:"line",
+source:sourceName,
+filter:["==",["get","Feat"],"Painted shoulders"],
+paint:{
+"line-color":"#C97A00",
+"line-width":3,
+"line-dasharray":[1,1]
+}
+});
+ 
+map.addLayer({
+id:`${sourceName}-parking`,
+type:"line",
+source:sourceName,
+filter:["==",["get","Feat"],"Parking protected bike lanes"],
+paint:{
+"line-color":"#8E5EA2",
+"line-width":7
+}
+});
+ 
+map.addLayer({
+id:`${sourceName}-protected`,
+type:"line",
+source:sourceName,
+filter:["==",["get","Feat"],"Protected bike lanes"],
+paint:{
+"line-color":"#B59F00",
+"line-width":8
+}
+});
+ 
+return getBounds(data);
+}
+ 
+const lightMap = new mapboxgl.Map({
+container:"light",
+style:"mapbox://styles/mapbox/light-v11",
+center:[-75.16,39.95],
+zoom:12
+});
+ 
+const darkMap = new mapboxgl.Map({
+container:"dark",
+style:"mapbox://styles/mapbox/dark-v11",
+center:[-75.16,39.95],
+zoom:12
+});
+ 
+Promise.all([
+new Promise(r=>lightMap.on("load",r)),
+new Promise(r=>darkMap.on("load",r))
+]).then(async ()=>{
+ 
+const bounds = await addBikeLayers(
+lightMap,
+"bike-light"
+);
+ 
+await addBikeLayers(
+darkMap,
+"bike-dark"
+);
+ 
+lightMap.fitBounds(bounds,{padding:40});
+darkMap.fitBounds(bounds,{padding:40});
+ 
+syncMaps(lightMap,darkMap);
+ 
+});
+ 
+</script>
+ 
+</body>
+</html>
